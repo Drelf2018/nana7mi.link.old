@@ -9,21 +9,9 @@
                 <a v-show="!room.sp" class="living" :href="'https://live.bilibili.com/' + room.room">直播中</a>
             </div>
             <div style="vertical-align: baseline; display: flex">
-                <div class="column">
-                    <p class="time">标题</p>
-                    <strong>{{ room.title }}</strong>
-                </div>
-                <div class="column">
-                    <p class="time">开始</p>
-                    <strong>{{ new Date(room.st * 1000).Format("yyyy-MM-dd hh:mm:ss") }}</strong>
-                </div>
-                <div v-show="room.sp" class="column">
-                    <p class="time">结束</p>
-                    <strong>{{ new Date(room.sp * 1000).Format("yyyy-MM-dd hh:mm:ss") }}</strong>
-                </div>
-                <div v-show="room.sp" class="column">
-                    <p class="time">营收</p>
-                    <strong>{{ (room.guard_buy + room.send_gift + room.super_chat_message).toFixed(2) }}</strong>
+                <div class="column" v-for="(value, key) in info">
+                    <p class="time">{{ key }}</p>
+                    <strong>{{ value }}</strong>
                 </div>
             </div>
         </div>
@@ -35,6 +23,22 @@ export default {
     name: 'Rooms',
     props: {
         room: Object
+    },
+    methods: {
+        format(tt) {
+            if (tt) return new Date(tt * 1000).Format("yyyy-MM-dd hh:mm:ss");
+            else return '直播中';
+        }
+    },
+    computed: {
+        info() {
+            return {
+                '标题': this.room.title,
+                '开始': this.format(this.room.st),
+                '结束': this.format(this.room.sp),
+                '营收': (this.room.guard_buy + this.room.send_gift + this.room.super_chat_message).toFixed(2)
+            }
+        }
     }
 }
 </script>
@@ -61,6 +65,11 @@ img.cover {
     margin: 20px;
     border-radius: 10px;
     box-shadow: 0 7px 10px grey;
+    transition: all 0.3s;
+}
+
+img.cover:hover {
+    opacity: 0.7;
 }
 
 div.live {

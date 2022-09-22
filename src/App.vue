@@ -1,5 +1,5 @@
 <template>
-  <Nav href='https://t.bilibili.com/682043379459031137' src="src/assets/eyes.png"></Nav>
+  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png"></Nav>
   <Swiper class="swiperBox" speed="7000" height="200px"></Swiper>
   <h1 id="title">
     😎 nana7mi.link

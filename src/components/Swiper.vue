@@ -20,15 +20,17 @@ export default {
         speed: String,
         height: String
     },
+    computed: {
+        imgList() {
+            if (this.banner) return this.banner.filter(b => b.location == "index_preview")
+            else return [
+                'https://prts.wiki/images/thumb/9/91/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg/1170px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg',
+                'https://prts.wiki/images/a/aa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A5%BD%E4%B9%85%E4%B8%8D%E8%A7%81_01.jpg',
+            ]
+        }
+    },
     data() {
         return {
-            imgList: [
-                'https://nana7mi.link/eyes',
-                'https://prts.wiki/images/thumb/9/91/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg/1170px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg',
-                'https://nana7mi.link/eyes',
-                'https://prts.wiki/images/a/aa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A5%BD%E4%B9%85%E4%B8%8D%E8%A7%81_01.jpg',
-                'https://prts.wiki/images/a/aa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A5%BD%E4%B9%85%E4%B8%8D%E8%A7%81_01.jpg',
-            ],
             timer: null,
             count: 1,
             swiper: null
@@ -69,6 +71,12 @@ export default {
         }
     },
     mounted() {
+        var that = this;
+        axios
+            .get('https://api.live.bilibili.com/xlive/web-interface/v1/index/getList?platform=web')
+            .then((response) => that.banner = response.data.banner)
+            .catch((error) => console.log(error));
+
         this.total = this.imgList.length;
         this.swiper = document.getElementById('swiper');
         var maxAlpha = 0;
