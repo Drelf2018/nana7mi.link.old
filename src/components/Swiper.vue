@@ -26,22 +26,28 @@ export default {
     data() {
         return {
             timer: null,
-            count: 1,
-            swiper: null
+            count: 0,
+            swiper: null,
+            lsatMove: new Date().getTime()
         }
     },
     updated() {
         this.total = this.banner.length;
+        this.swiper.style.width = this.total + '00%';
         var maxAlpha = 0;
-        Array.from(this.swiper.children).forEach(
-            pp => {
-                var img = pp.lastChild.lastChild
-                var alpha = img.width / img.height;
-                if(alpha > maxAlpha) maxAlpha = alpha;
+        this.banner.forEach(
+            obj => {
+                var currentImg = new Image();
+                currentImg.src = obj.url;
+                setTimeout(() => {
+                    var alpha = currentImg.width / currentImg.height;
+                    if(alpha > maxAlpha) maxAlpha = alpha;
+                }, 100);
             }
         )
-        document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
-        this.swiper.style.width = this.total + '00%';
+        setTimeout(() => {
+            document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
+        }, 300);
     },
     methods: {
         stop() {
@@ -54,27 +60,53 @@ export default {
         start() {
             var that = this;
             function autoScroll() {
-                that.swiper.style.left = -100 * that.count + '%';
                 that.count += 1;
-                if (that.count >= that.total) that.count = 0;
+                that.swiper.style.transition = "all 0.5s";
+                that.swiper.style.left = -100 * that.count + '%';
+                if (that.count >= that.total - 1)
+                    setTimeout(() => {
+                        that.swiper.style.transition = "none";
+                        that.swiper.style.left = '0%';
+                        that.count = 0;
+                    }, 505);
             }
             this.timer = setInterval(autoScroll, parseInt(this.speed));
         },
         moveNow(fro) {
+            var tt = new Date().getTime();
+            if (tt - this.lsatMove > 505) this.lsatMove = tt;
+            else return;
             this.stop();
             if (this.swiper.style.left) {
                 this.count = parseInt(this.swiper.style.left)/-100 + fro;
             } else {
                 this.count = fro;
             }
-            if (this.count >= this.total) this.count = 0;
-            if (this.count < 0) this.count = this.total - 1;
-            this.swiper.style.left = -100 * this.count + '%';
+            if (this.count >= this.total - 1) {
+                this.count = 0;
+                this.swiper.style.left = -100 * (this.total - 1) + '%';
+                setTimeout(() => {
+                    this.swiper.style.transition = "none";
+                    this.swiper.style.left = '0%';
+                    setTimeout(() => {
+                        this.swiper.style.transition = "all 0.5s";
+                    }, 30);
+                }, 505);
+            }
+            else if (this.count < 0) {
+                this.count = this.total - 2;
+                this.swiper.style.transition = "none";
+                this.swiper.style.left = -100 * (this.total - 1) + '%';
+                setTimeout(() => {
+                    this.swiper.style.transition = "all 0.5s";
+                    this.swiper.style.left = -100 * this.count + '%';
+                }, 30);
+            }
+            else this.swiper.style.left = -100 * this.count + '%';
         }
     },
     mounted() {
         this.swiper = document.getElementById('swiper');
-        
         this.start();
     },
     beforeDestroy() {
@@ -85,7 +117,7 @@ export default {
 
 <style>
 #swiperBox {
-    width: 447px;
+    width: 0px;
     /* margin: 20px auto; */
     height: 250px;
     position: relative;
@@ -121,7 +153,7 @@ export default {
     position: relative;
     height: 100%;
     display: flex;
-    transition: all 1s;
+    transition: all 0.5s;
 }
 
 .imgDiv {

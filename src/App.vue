@@ -62,9 +62,10 @@ export default {
         }
       }
       var banner = this.banner.filter(b => b.location == "index_preview");
-      var res = [];
+      var res = [new Banner("https://www.bilibili.com/video/BV1tG411g7Fo", "http://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png")];
       for (var i = 0; i < banner.length; i++)
         res.push(new Banner(banner[i].link, banner[i].pic));
+      res.push(res[0]);
       return res;
     }
   }
