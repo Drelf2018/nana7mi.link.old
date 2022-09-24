@@ -81,9 +81,9 @@ export default {
 
 <style>
 .main {
-  width: calc(80vw - 296px);
+  width: 60%;
   margin: 20px auto;
-  padding-left: 370px;
+  padding-left: 25%;
 }
 
 .sb {

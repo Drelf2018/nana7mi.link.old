@@ -27,7 +27,7 @@ export default {
 <style>
 #test {
     top: 56px;
-    width: 370px;
+    width: 25%;
     height: calc(100vh - 56px);
     position: fixed;
     background-color: aqua;
