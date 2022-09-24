@@ -118,7 +118,6 @@ export default {
 <style>
 #swiperBox {
     width: 0px;
-    /* margin: 20px auto; */
     height: 250px;
     position: relative;
     border-radius: 10px;

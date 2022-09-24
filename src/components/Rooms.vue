@@ -1,11 +1,12 @@
 <template>
     <div class="live">
-        <a :href="'https://space.bilibili.com/' + room.uid">
-            <img class="cover" :alt="room.cover" :src="room.cover ? room.cover : noCover">
+        <a :href="room.cover">
+            <img class="cover" :alt="room.cover" :src="room.cover" :style="room.cover ? '' : 'opacity: 0;'">
         </a>
         <div class="info">
             <a :href="'https://space.bilibili.com/' + room.uid" style="color: #000"><strong>{{ room.username }}</strong></a>
-            <a v-show="!room.sp" class="living" :href="'https://live.bilibili.com/' + room.room">直播中</a>
+            <a v-show="!room.sp" class="tag living" :href="'https://live.bilibili.com/' + room.room">直播中</a>
+            <a v-show="room.sp" class="tag prepare" :href="'https://live.bilibili.com/' + room.room">下播了</a>
             <div class="data">
                 <div class="column" v-for="(value, key) in info">
                     <p class="time">{{ key }}</p>
@@ -28,18 +29,13 @@ export default {
             else return '直播中';
         }
     },
-    data() {
-        return {
-            noCover: 'https://i0.hdslb.com/bfs/live/new_room_cover/cdc675883ef54f3ed1a8ceacc638fcd145ef3bbb.jpg'
-        }
-    },
     computed: {
         info() {
             return {
                 '标题': this.room.title,
                 '开始': this.format(this.room.st),
                 '结束': this.format(this.room.sp),
-                '营收': (this.room.guard_buy + this.room.send_gift + this.room.super_chat_message).toFixed(2)
+                '营收': this.room.sp ? (this.room.guard_buy + this.room.send_gift + this.room.super_chat_message).toFixed(2) : "暂无"
             }
         }
     }
@@ -47,32 +43,42 @@ export default {
 </script>
 
 <style>
-.living {
+.tag {
     color: #FFF;
     font-weight: 700;
     margin-left: 0.5em;
     padding: 0.3em 0.4em;
     border-radius: 0.25em;
+}
+
+.living {
     background-color: rgb(13, 110, 253);
+}
+
+.prepare {
+    background-color: rgb(57, 172, 72);
 }
 
 .cover {
     width: 196px;
     height: 110px;
     float: left;
-    margin: 20px;
-    border-radius: 10px;
-    box-shadow: 0 7px 10px grey;
-    transition: all 0.3s;
-}
-
-.cover:hover {
-    opacity: 0.7;
+    margin-right: 1em;
+    border-radius: 5px;
+    box-shadow: 0 3px 6px grey;
 }
 
 .live {
-    /* margin: 0px 15%; */
+    padding: 1em;
+    margin-bottom: 1em;
     overflow: hidden;
+    border-radius: 5px;
+    transition: all 0.3s;
+    box-shadow: 0 3px 1px -2px rgb(0 0 0 / 12%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 20%)
+}
+
+.live:hover {
+    background-color: #EFEFFA;
 }
 
 .time {
@@ -90,10 +96,10 @@ export default {
 }
 
 .info {
-    margin-top: 26px;
+    margin-top: 0.5em;
 }
 
-/* 响应式布局 - 小于 600 px 时改为上下布局 */
+/* 响应式布局 - 小于 900 px 时改为上下布局 */
 @media screen and (max-width: 900px) {
     .time {
         display: inline-block;
@@ -110,12 +116,6 @@ export default {
 
     .cover {
         float: none;
-    }
-
-    .info {
-        margin-top: 0px;
-        margin-left: 20px;
-        margin-bottom: 10px;
     }
 }
 </style>

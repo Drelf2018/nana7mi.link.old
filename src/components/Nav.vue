@@ -26,9 +26,7 @@ nav {
   background-color: rgb(33, 37, 41);
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  flex-wrap: nowrap;
-  flex-direction: row;
+  justify-content: space-evenly;
   z-index: 4;
 }
 

@@ -1,21 +1,27 @@
 <template>
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png"></Nav>
-  <div style="display: flex; justify-content: space-evenly; margin: 20px auto">
-    <Swiper class="swiperBox" speed="7000" height="200px" :banner="bannerFilter"></Swiper>
-  </div>
-  <div class="main">
-    <h1 style="display: inline-block">
-      😎 nana7mi.link
-      <span style="font-size: 0.6em; color: grey"><em>{{ selected }}</em></span>
-    </h1>
-    <Rooms v-for="room in roomsRecently" :room="room"></Rooms>
+  <div class="view">
+    <Sider></Sider>
+    <div class="main">
+      <div class="sb">
+        <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
+        <iframe src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1vJ411B7ng&cid=133606284&page=1"
+          scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+      </div>
+      <h1 style="display: inline-block">
+        😎 nana7mi.link
+        <span style="font-size: 0.6em; color: grey"><em>{{ selected }}</em></span>
+      </h1>
+      <Rooms v-for="room in roomsRecently" :room="room"></Rooms>
+    </div>
   </div>
 </template>
 
 <script>
 import Nav from './components/nav.vue';
 import Rooms from './components/Rooms.vue';
-import Swiper from './components/Swiper.vue'
+import Swiper from './components/Swiper.vue';
+import Sider from './components/Sider.vue';
 
 
 export default {
@@ -23,7 +29,8 @@ export default {
   components: {
     Nav,
     Rooms,
-    Swiper
+    Swiper,
+    Sider
   },
   mounted() {
     var that = this;
@@ -74,7 +81,24 @@ export default {
 
 <style>
 .main {
-  width: 70%;
+  width: calc(80vw - 296px);
   margin: 20px auto;
+  padding-left: 370px;
+}
+
+.sb {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 20px auto;
+}
+
+@media screen and (max-width: 900px) {
+  .main {
+    width: 75%;
+    padding-left: 0;
+  }
+  .sb {
+    display: none;
+  }
 }
 </style>
