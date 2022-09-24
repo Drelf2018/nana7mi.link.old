@@ -5,4 +5,5 @@ with open('.\\dist\\index.html', 'r', encoding='utf-8') as fp:
     content = content.replace('/favicon', 'favicon').replace('/_assets/', '')
     with open('.\\dist\\index.html', 'w', encoding='utf-8') as f:
         f.write(content)
+open('.\\dist\\CNAME', 'w', encoding='utf-8').write('gh.nana7mi.link')
 os.system('auto.bat')
