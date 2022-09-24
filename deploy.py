@@ -6,4 +6,4 @@ with open('.\\dist\\index.html', 'r', encoding='utf-8') as fp:
     with open('.\\dist\\index.html', 'w', encoding='utf-8') as f:
         f.write(content)
 
-os.system('deploy.bat')
+os.system('auto.bat')
