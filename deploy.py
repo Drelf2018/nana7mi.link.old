@@ -7,7 +7,7 @@ with open('.\\dist\\index.html', 'r', encoding='utf-8') as fp:
         f.write(content)
 
 cmd = '''cd dist
-move .\_assets\* .
+move .\\_assets\\* .
 rmdir /Q _assets
 
 git init
