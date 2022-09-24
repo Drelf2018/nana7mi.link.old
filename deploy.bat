@@ -1,4 +1,8 @@
+copy temp.html .\dist\index.html
 cd dist
+move .\_assets\* .
+rmdir /Q _assets
+
 git init
 git add -A
 git commit -m deploy

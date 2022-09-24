@@ -1,11 +1,15 @@
 <template>
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png"></Nav>
-  <Swiper class="swiperBox" speed="7000" height="200px"></Swiper>
-  <h1 id="title">
-    😎 nana7mi.link
-    <span style="font-size: 0.6em; color: grey"><em>{{ selected }}</em></span>
-  </h1>
-  <Rooms v-for="room in roomsRecently" :room="room"></Rooms>
+  <div style="display: flex; justify-content: space-evenly; margin: 20px auto">
+    <Swiper class="swiperBox" speed="7000" height="200px" :banner="bannerFilter"></Swiper>
+  </div>
+  <div class="main">
+    <h1 style="display: inline-block">
+      😎 nana7mi.link
+      <span style="font-size: 0.6em; color: grey"><em>{{ selected }}</em></span>
+    </h1>
+    <Rooms v-for="room in roomsRecently" :room="room"></Rooms>
+  </div>
 </template>
 
 <script>
@@ -25,12 +29,18 @@ export default {
     var that = this;
     axios
       .get('https://api.nana7mi.link/rooms')
-      .then((response) => that.rooms = response.data.rooms)
-      .catch((error) => console.log(error));
+      .then(response => that.rooms = response.data.rooms)
+      .catch(error => console.log(error));
+
+    axios
+      .get('https://api.nana7mi.link//api')
+      .then(response => that.banner = response.data.data.banner)
+      .catch(error => console.log(error));
   },
   data() {
     return {
-      rooms: null,
+      rooms: [],
+      banner: [],
       quotations: [
         '你们会无缘无故的说好用，就代表哪天无缘无故的就要骂难用',
         '哈咯哈咯，听得到吗',
@@ -42,9 +52,28 @@ export default {
   },
   computed: {
     selected() { return this.quotations[Math.floor((Math.random() * this.quotations.length))]; },
-    roomsRecently() {
-      if (this.rooms) return this.rooms.filter(room => this.timestamp - room.st <= 604800)
+    roomsRecently() { return this.rooms.filter(room => this.timestamp - room.st <= 604800) },
+    bannerFilter() {
+      function Banner(link, url) {
+        this.link = link;
+        this.url = url;
+        this.showInfo = function () {
+          console.log(this.link + ': ' + this.url);
+        }
+      }
+      var banner = this.banner.filter(b => b.location == "index_preview");
+      var res = [];
+      for (var i = 0; i < banner.length; i++)
+        res.push(new Banner(banner[i].link, banner[i].pic));
+      return res;
     }
   }
 }
 </script>
+
+<style>
+.main {
+  width: 70%;
+  margin: 20px auto;
+}
+</style>

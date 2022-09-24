@@ -1,14 +1,12 @@
 <template>
     <div class="live">
         <a :href="'https://space.bilibili.com/' + room.uid">
-            <img class="cover" alt="" :src="room.cover">
+            <img class="cover" :alt="room.cover" :src="room.cover ? room.cover : noCover">
         </a>
-        <div style="margin-top: 26px">
-            <div>
-                <h3 class="name">{{ room.username }}</h3>
-                <a v-show="!room.sp" class="living" :href="'https://live.bilibili.com/' + room.room">直播中</a>
-            </div>
-            <div style="vertical-align: baseline; display: flex">
+        <div class="info">
+            <a :href="'https://space.bilibili.com/' + room.uid" style="color: #000"><strong>{{ room.username }}</strong></a>
+            <a v-show="!room.sp" class="living" :href="'https://live.bilibili.com/' + room.room">直播中</a>
+            <div class="data">
                 <div class="column" v-for="(value, key) in info">
                     <p class="time">{{ key }}</p>
                     <strong>{{ value }}</strong>
@@ -30,6 +28,11 @@ export default {
             else return '直播中';
         }
     },
+    data() {
+        return {
+            noCover: 'https://i0.hdslb.com/bfs/live/new_room_cover/cdc675883ef54f3ed1a8ceacc638fcd145ef3bbb.jpg'
+        }
+    },
     computed: {
         info() {
             return {
@@ -44,21 +47,16 @@ export default {
 </script>
 
 <style>
-h3.name {
-    margin: 0;
-    display: inline-block;
-    padding-right: 5px;
-}
-
-a.living {
+.living {
     color: #FFF;
     font-weight: 700;
-    padding: 0.4em 0.5em;
+    margin-left: 0.5em;
+    padding: 0.3em 0.4em;
     border-radius: 0.25em;
     background-color: rgb(13, 110, 253);
 }
 
-img.cover {
+.cover {
     width: 196px;
     height: 110px;
     float: left;
@@ -68,19 +66,16 @@ img.cover {
     transition: all 0.3s;
 }
 
-img.cover:hover {
+.cover:hover {
     opacity: 0.7;
 }
 
-div.live {
-    width: 85%;
-    margin: 0px 15%;
-    overflow: auto;
-    /* border: 3px solid green; */
+.live {
+    /* margin: 0px 15%; */
     overflow: hidden;
 }
 
-p.time {
+.time {
     color: grey;
 }
 
@@ -90,15 +85,37 @@ p.time {
     width: 25%;
 }
 
+.data {
+    display: flex;
+}
+
+.info {
+    margin-top: 26px;
+}
+
 /* 响应式布局 - 小于 600 px 时改为上下布局 */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 900px) {
+    .time {
+        display: inline-block;
+        margin: 0.5em 0.5em 0 0;
+    }
+
     .column {
-        margin-left: 20px;
         width: 100%;
     }
 
-    h3.name {
+    .data {
+        flex-direction: column;
+    }
+
+    .cover {
+        float: none;
+    }
+
+    .info {
+        margin-top: 0px;
         margin-left: 20px;
+        margin-bottom: 10px;
     }
 }
 </style>

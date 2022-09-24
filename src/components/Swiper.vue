@@ -2,9 +2,11 @@
     <div id="swiperBox" @mouseenter="stop" @mouseleave="start" :style="{'height': height}">
         <div class="hidden">
             <div id="swiper">
-                <div class="imgDiv" v-for="(item,index) of imgList" :key="index">
-                    <img class="swiper-width" :src="item">
-                    <img class="swiper-height" :src="item">
+                <div class="imgDiv" v-for="obj in banner">
+                    <a :href="obj.link">
+                        <img class="swiper-width" :src="obj.url">
+                        <img class="swiper-height" :src="obj.url">
+                    </a>
                 </div>
             </div>
         </div>
@@ -18,16 +20,8 @@ export default {
     name: 'Swiper',
     props: {
         speed: String,
-        height: String
-    },
-    computed: {
-        imgList() {
-            if (this.banner) return this.banner.filter(b => b.location == "index_preview")
-            else return [
-                'https://prts.wiki/images/thumb/9/91/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg/1170px-%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E9%95%BF%E5%A4%9C%E4%B8%B4%E5%85%892022_01.jpg',
-                'https://prts.wiki/images/a/aa/%E6%B4%BB%E5%8A%A8%E9%A2%84%E5%91%8A_%E5%A5%BD%E4%B9%85%E4%B8%8D%E8%A7%81_01.jpg',
-            ]
-        }
+        height: String,
+        banner: null
     },
     data() {
         return {
@@ -36,18 +30,26 @@ export default {
             swiper: null
         }
     },
+    updated() {
+        this.total = this.banner.length;
+        var maxAlpha = 0;
+        Array.from(this.swiper.children).forEach(
+            pp => {
+                var img = pp.lastChild.lastChild
+                var alpha = img.width / img.height;
+                if(alpha > maxAlpha) maxAlpha = alpha;
+            }
+        )
+        document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
+        this.swiper.style.width = this.total + '00%';
+    },
     methods: {
-        clickLeft() {
-            this.theDirection = 'left';
-        },
-        clickRight() {
-            this.theDirection = 'right';
-        },
         stop() {
             if (this.timer) {
                 clearInterval(this.timer);
                 this.timer = null;
             }
+
         },
         start() {
             var that = this;
@@ -71,34 +73,20 @@ export default {
         }
     },
     mounted() {
-        var that = this;
-        axios
-            .get('https://api.live.bilibili.com/xlive/web-interface/v1/index/getList?platform=web')
-            .then((response) => that.banner = response.data.banner)
-            .catch((error) => console.log(error));
-
-        this.total = this.imgList.length;
         this.swiper = document.getElementById('swiper');
-        var maxAlpha = 0;
-        Array.from(this.swiper.children).forEach(
-            (pp) => {
-                var alpha = pp.lastChild.width / pp.lastChild.height;
-                if(alpha > maxAlpha) maxAlpha = alpha;
-            }
-        )
-        document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
-        this.swiper.style.width = this.imgList.length + '00%';
+        
         this.start();
     },
     beforeDestroy() {
-        self.stop()
+        this.stop();
     }
 }
 </script>
 
 <style>
 #swiperBox {
-    margin: 20px auto;
+    width: 447px;
+    /* margin: 20px auto; */
     height: 250px;
     position: relative;
     border-radius: 10px;
@@ -117,7 +105,7 @@ export default {
     opacity: 0.5;
 }
 
-.btn:hover {
+#swiperBox:hover .btn {
     opacity: 1;
 }
 
