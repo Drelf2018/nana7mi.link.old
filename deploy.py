@@ -18,3 +18,4 @@ cd ..'''
 
 for c in cmd.split('\n'):
     os.system(c)
+    input()
