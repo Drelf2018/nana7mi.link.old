@@ -1,6 +1,7 @@
 body {
   margin: 0px;
   background-color: rgb(246,248,250);
+  overflow-x: hidden;
 }
 
 #app {

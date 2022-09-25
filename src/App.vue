@@ -13,14 +13,14 @@
       </div>
       <h1 id="title"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
-      <Rooms v-for="room in roomsRecently" :room="room"></Rooms>
+      <Room v-for="room in roomsRecently" style="left: 0" :room="room" @click="roomClick(room.room)"></Room>
     </div>
   </div>
 </template>
 
 <script>
 import Nav from './components/nav.vue';
-import Rooms from './components/Rooms.vue';
+import Room from './components/Room.vue';
 import Swiper from './components/Swiper.vue';
 import Sider from './components/Sider.vue';
 
@@ -29,7 +29,7 @@ export default {
   name: 'App',
   components: {
     Nav,
-    Rooms,
+    Room,
     Swiper,
     Sider
   },
@@ -58,7 +58,7 @@ export default {
         '直播只是工作吗直播只是工作吗直播只是工作吗？'
       ],
       qtd: 0,
-      siderStatus: 1,
+      siderStatus: 0,
       siderMove: new Date().getTime(),
       timestamp: Date.parse(new Date()) / 1000
     }
@@ -76,36 +76,48 @@ export default {
       function Banner(link, url) {
         this.link = link;
         this.url = url;
-        this.showInfo = function () {
-          console.log(this.link + ': ' + this.url);
-        }
-      }
-      // var banner = this.banner.filter(b => b.location == "index_preview");
+      };
       var res = [
         new Banner(
           "https://www.bilibili.com/video/BV1tG411g7Fo",
           "http://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png"
         ),
-        new Banner(
-          "https://www.bilibili.com/video/BV1pR4y1W7M7",
-          "esu1.png"
-        ),
-        new Banner(
-          "",
-          "esu2.png"
-        ),
-        new Banner(
-          "",
-          "esu3.png"
-        )
+        new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
+        new Banner("", "esu2.png"),
+        new Banner("", "esu3.png")
       ];
-      // for (var i = 0; i < banner.length; i++)
-      //   res.push(new Banner(banner[i].link, banner[i].pic));
       res.push(res[0]);
       return res;
     }
   },
   methods: {
+    roomClick(roomid) {
+      console.log(roomid);
+      axios
+        .get('https://api.nana7mi.link/live/'+roomid)
+        .then(response => {
+          var rooms = document.getElementsByClassName("live")
+          Array.from(rooms).forEach(
+            (pp) => {
+              pp.style.opacity = 0;
+              pp.style.left = "100%";
+            }
+          )
+          setTimeout(() => {
+            this.rooms = response.data.lives
+            setTimeout(() => {
+              var rooms = document.getElementsByClassName("live")
+              Array.from(rooms).forEach(
+                (pp) => {
+                  pp.style.opacity = 1;
+                  pp.style.left = "0%";
+                }
+              )
+            }, 505)
+          }, 505)
+        })
+        .catch(error => console.log(error));
+    },
     moveSider() {
       var tt = new Date().getTime();
       if (tt - this.siderMove > 505) this.siderMove = tt;
@@ -170,7 +182,6 @@ export default {
 #main {
   width: 75%;
   margin: 0px auto;
-  padding-left: 20%;
   transition: all 0.5s;
 }
 

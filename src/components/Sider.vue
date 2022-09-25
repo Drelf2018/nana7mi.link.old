@@ -1,9 +1,6 @@
 <template>
-    <div class="hidden-sider" style="left: 0%">
+    <div class="hidden-sider" style="left: -100%">
         <div style="overflow: auto; height: 100%">
-            <p style="font-size: 50px">你好李鑫</p>
-            <p style="font-size: 50px">这个颜色叫</p>
-            <p style="font-size: 100px">Aqua</p>
         </div>
     </div>
 </template>
@@ -28,7 +25,9 @@ export default {
     width: 20%;
     height: calc(100vh - 56px);
     position: fixed;
-    background-color: aqua;
+    background-color: #FFF;
+    border-right: 1px solid rgb(216, 222, 228);
+    z-index: 4;
 }
 
 @media screen and (max-width: 900px) {
