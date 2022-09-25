@@ -13,6 +13,7 @@
       </div>
       <h1 id="title"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
+      <input id="roomid" type="text" placeholder="输入房间号并回车查询指定直播间" @change.lazy="(event) => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="left: 0" :room="room" @click="roomClick(room.room)"></Room>
     </div>
   </div>
@@ -41,11 +42,6 @@ export default {
       .get('https://api.nana7mi.link/rooms')
       .then(response => that.rooms = response.data.rooms)
       .catch(error => console.log(error));
-
-    // axios
-    //   .get('https://api.nana7mi.link/api')
-    //   .then(response => that.banner = response.data.data.banner)
-    //   .catch(error => console.log(error));
   },
   data() {
     return {
@@ -93,7 +89,6 @@ export default {
   },
   methods: {
     roomClick(roomid, force=false) {
-      console.log(roomid);
       if (this.subroom && !force) return;
       else this.subroom = true;
       axios
@@ -101,7 +96,7 @@ export default {
         .then(response => response.data.lives)
         .then(lives => {
           if (!lives) return;
-          this.moveSider();
+          document.getElementById('roomid').scrollIntoView({behavior: 'smooth'})
           var rooms = document.getElementsByClassName("live")
           Array.from(rooms).forEach(
             (pp) => {
@@ -175,6 +170,7 @@ export default {
 }
 
 #title {
+  margin-top: 1.44px;
   display: inline-block;
 }
 
@@ -183,6 +179,26 @@ export default {
   padding-left: 0.5em;
   font-size: 1em;
   color: grey;
+}
+
+#roomid {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 2.5em;
+  font-size: 1em;
+  font-weight: 540;
+  padding: 1px 0 0 0.5em;
+  margin: 0 auto 1.34em;
+  border: 1px solid #ced4da;
+  border-radius: 0.25em;
+  transition: all 0.2s;
+}
+
+#roomid:focus {
+  border-color: #86b7fe;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
 
 #main {

@@ -16,7 +16,6 @@
                 </ul>
             </div>
             <div class="content">
-                <input type="number" @change.lazy="(event) => callback(event.target.value, true)">
             </div>
         </div>
     </div>
@@ -25,9 +24,6 @@
 <script>
 export default {
     name: 'Sider',
-    props: {
-        callback: null
-    },
     data() {
         return {
             repositories: {
