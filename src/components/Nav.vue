@@ -2,6 +2,7 @@
   <nav @click="ldd">
     <a href="/">🏠</a>
     <div id="island" @mouseleave="close()">
+      <span style="font-size: 100px; opacity: 0; transition: all 0.5s;">灵动岛</span>
     </div>
     <a :href="href">
       <img class="eyes" :src="src" alt="eyes" @mouseenter="open()" >
@@ -27,6 +28,7 @@ export default {
       this.island.style.boxShadow = "0 7px 10px grey";
       this.plan = setTimeout(() => {
         this.island.style.height = h;
+        this.island.lastChild.style.opacity = 1;
       }, wait)
     },
     close() {
@@ -37,6 +39,7 @@ export default {
       this.island.style.boxShadow = "none";
       this.island.style.width = "95px";
       this.island.style.height = "40px";
+      this.island.lastChild.style.opacity = 0;
     }
   }
 }
@@ -67,6 +70,9 @@ nav {
   background-color: #FFF;
   box-shadow: none;
   display: flex;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
   z-index: 5;
 }
 
