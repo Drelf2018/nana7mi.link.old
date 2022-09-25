@@ -2,7 +2,7 @@
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png"></Nav>
   <ion-icon class="menu" name="menu-outline" @click="moveSider"></ion-icon>
   <div class="view">
-    <Sider id="sider" style="transition: all 0.5s"></Sider>
+    <Sider id="sider" style="transition: all 0.5s" :callback="roomClick"></Sider>
     <div id="main">
       <div class="sb">
         <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
@@ -60,6 +60,7 @@ export default {
       qtd: 0,
       siderStatus: 0,
       siderMove: new Date().getTime(),
+      subroom: false,
       timestamp: Date.parse(new Date()) / 1000
     }
   },
@@ -71,7 +72,7 @@ export default {
         ) - this.qtd
       ];
     },
-    roomsRecently() { return this.rooms.filter(room => this.timestamp - room.st <= 604800) },
+    roomsRecently() { return this.rooms.filter(room => this.subroom || (this.timestamp - room.st <= 604800)) },
     bannerFilter() {
       function Banner(link, url) {
         this.link = link;
@@ -91,11 +92,16 @@ export default {
     }
   },
   methods: {
-    roomClick(roomid) {
+    roomClick(roomid, force=false) {
       console.log(roomid);
+      if (this.subroom && !force) return;
+      else this.subroom = true;
       axios
         .get('https://api.nana7mi.link/live/'+roomid)
-        .then(response => {
+        .then(response => response.data.lives)
+        .then(lives => {
+          if (!lives) return;
+          this.moveSider();
           var rooms = document.getElementsByClassName("live")
           Array.from(rooms).forEach(
             (pp) => {
@@ -104,7 +110,7 @@ export default {
             }
           )
           setTimeout(() => {
-            this.rooms = response.data.lives
+            this.rooms = lives
             setTimeout(() => {
               var rooms = document.getElementsByClassName("live")
               Array.from(rooms).forEach(
