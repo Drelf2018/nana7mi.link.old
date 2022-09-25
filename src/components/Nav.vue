@@ -2,10 +2,9 @@
   <nav @click="ldd">
     <a href="/">🏠</a>
     <div id="island" @mouseleave="close()">
-      <img class="ip14" src="ip14.png">
     </div>
     <a :href="href">
-      <img class="eyes" :src="src" alt="eyes" @mouseenter="open('265.5px', '265.5px', '535.7px', 0)" >
+      <img class="eyes" :src="src" alt="eyes" @mouseenter="open()" >
     </a>
     <a href="/about">❔</a>
   </nav>
@@ -25,7 +24,7 @@ export default {
     open(w1="40%", w2="95%", h="40%", wait=300) {
       if (document.body.clientWidth > 883) this.island.style.width = w1;
       else this.island.style.width = w2;
-      // this.island.lastChild.style.borderShadow = "0 7px 10px grey";
+      this.island.style.boxShadow = "0 7px 10px grey";
       this.plan = setTimeout(() => {
         this.island.style.height = h;
       }, wait)
@@ -35,7 +34,7 @@ export default {
         clearInterval(this.plan);
         this.plan = null;
       }
-      // this.island.lastChild.style.borderShadow = "none";
+      this.island.style.boxShadow = "none";
       this.island.style.width = "95px";
       this.island.style.height = "40px";
     }
@@ -65,7 +64,7 @@ nav {
   height: 40px;
   border-radius: 7px;
   transition: all 0.3s;
-  /* background-color: #FFF; */
+  background-color: #FFF;
   box-shadow: none;
   display: flex;
   z-index: 5;
