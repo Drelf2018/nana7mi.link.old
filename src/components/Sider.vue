@@ -1,11 +1,9 @@
 <template>
-    <div id="test">
+    <div class="hidden-sider" style="left: 0%">
         <div style="overflow: auto; height: 100%">
-            <p style="font-size: 100px">你好</p>
-            <p style="font-size: 100px">你好</p>
-            <p style="font-size: 100px">你好</p>
-            <p style="font-size: 100px">你好</p>
-            <p style="font-size: 100px">你好</p>
+            <p style="font-size: 50px">你好李鑫</p>
+            <p style="font-size: 50px">这个颜色叫</p>
+            <p style="font-size: 100px">Aqua</p>
         </div>
     </div>
 </template>
@@ -25,17 +23,17 @@ export default {
 </script>
 
 <style>
-#test {
+.hidden-sider {
     top: 56px;
-    width: 25%;
+    width: 20%;
     height: calc(100vh - 56px);
     position: fixed;
     background-color: aqua;
 }
 
 @media screen and (max-width: 900px) {
-  #test {
-    display: none;
+  .hidden-sider {
+    width: 100%;
   }
 }
 </style>

@@ -32,24 +32,27 @@ export default {
         }
     },
     updated() {
-        this.total = this.banner.length;
-        this.swiper.style.width = this.total + '00%';
-        var maxAlpha = 0;
-        this.banner.forEach(
-            obj => {
-                var currentImg = new Image();
-                currentImg.src = obj.url;
-                setTimeout(() => {
-                    var alpha = currentImg.width / currentImg.height;
-                    if(alpha > maxAlpha) maxAlpha = alpha;
-                }, 100);
-            }
-        )
-        setTimeout(() => {
-            document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
-        }, 300);
+        this.updateStyle();
     },
     methods: {
+        updateStyle() {
+            this.total = this.banner.length;
+            this.swiper.style.width = this.total + '00%';
+            var maxAlpha = 0;
+            this.banner.forEach(
+                obj => {
+                    var currentImg = new Image();
+                    currentImg.src = obj.url;
+                    setTimeout(() => {
+                        var alpha = currentImg.width / currentImg.height;
+                        if(alpha > maxAlpha) maxAlpha = alpha;
+                    }, 100);
+                }
+            )
+            setTimeout(() => {
+                document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
+            }, 300);
+        },
         stop() {
             if (this.timer) {
                 clearInterval(this.timer);
@@ -107,6 +110,7 @@ export default {
     },
     mounted() {
         this.swiper = document.getElementById('swiper');
+        this.updateStyle();
         this.start();
     },
     beforeDestroy() {
