@@ -10,8 +10,8 @@
                 </div>
             </div>
         </div>
-        <ion-icon name="chevron-back-circle" class="btn" style="left: 10px" @click="moveNow(-1)"></ion-icon>
-        <ion-icon name="chevron-forward-circle" class="btn" style="right: 10px" @click="moveNow(1)"></ion-icon>
+        <ion-icon name="chevron-back-circle" class="btn" style="left: 10px" @click="move(-1)"></ion-icon>
+        <ion-icon name="chevron-forward-circle" class="btn" style="right: 10px" @click="move(1)"></ion-icon>
     </div>
 </template>
 
@@ -28,7 +28,7 @@ export default {
             timer: null,
             count: 0,
             swiper: null,
-            lsatMove: new Date().getTime()
+            move: this.throttle(this.moveNow, 550)
         }
     },
     updated() {
@@ -76,9 +76,6 @@ export default {
             this.timer = setInterval(autoScroll, parseInt(this.speed));
         },
         moveNow(fro) {
-            var tt = new Date().getTime();
-            if (tt - this.lsatMove > 505) this.lsatMove = tt;
-            else return;
             this.stop();
             if (this.swiper.style.left) {
                 this.count = parseInt(this.swiper.style.left)/-100 + fro;
@@ -94,7 +91,7 @@ export default {
                     setTimeout(() => {
                         this.swiper.style.transition = "all 0.5s";
                     }, 30);
-                }, 505);
+                }, 510);
             }
             else if (this.count < 0) {
                 this.count = this.total - 2;
@@ -137,7 +134,7 @@ export default {
     position: absolute;
     cursor: pointer;
     transition: all 0.3s;
-    opacity: 0.5;
+    opacity: 0;
 }
 
 #swiperBox:hover .btn {

@@ -1,6 +1,6 @@
 <template>
-  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png"></Nav>
-  <ion-icon class="menu" name="menu-outline" @click="moveSider"></ion-icon>
+  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :enter="open" :leave="close"></Nav>
+  <ion-icon class="menu" name="menu-outline" @click="move"></ion-icon>
   <div class="view">
     <Sider id="sider" style="transition: all 0.5s" :callback="roomClick"></Sider>
     <div id="main">
@@ -11,7 +11,7 @@
         <iframe class="roundShadow" src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1"
           scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
       </div>
-      <h1 id="title"><span @click="qtd++">😎</span> nana7mi.link</h1>
+      <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
       <input id="roomid" type="text" placeholder="输入房间号并回车查询指定直播间" @change.lazy="(event) => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="left: 0" :room="room" @click="roomClick(room.room)"></Room>
@@ -37,6 +37,7 @@ export default {
   mounted() {
     this.sider = document.getElementById('sider');
     this.main = document.getElementById('main');
+    this.island = document.getElementById('island');
     var that = this;
     axios
       .get('https://api.nana7mi.link/rooms')
@@ -55,7 +56,7 @@ export default {
       ],
       qtd: 0,
       siderStatus: 0,
-      siderMove: new Date().getTime(),
+      move: this.throttle(this.moveSider, 500),
       subroom: false,
       timestamp: Date.parse(new Date()) / 1000
     }
@@ -88,6 +89,30 @@ export default {
     }
   },
   methods: {
+    open(inner=null, w1="40%", w2="95%", h="40%", wait=300) {
+      if (inner) {
+        this.island.innerHTML = inner;
+        this.island.lastChild.style.opacity = 0;
+        this.island.lastChild.style.transition = "all 0.5s";
+      }
+      if (document.body.clientWidth > 883) this.island.style.width = w1;
+      else this.island.style.width = w2;
+      this.island.style.boxShadow = "0 7px 10px grey";
+      this.plan = setTimeout(() => {
+        this.island.style.height = h;
+        this.island.lastChild.style.opacity = 1;
+      }, wait)
+    },
+    close() {
+      if (this.plan) {
+        clearInterval(this.plan);
+        this.plan = null;
+      }
+      this.island.style.boxShadow = "none";
+      this.island.style.width = "95px";
+      this.island.style.height = "40px";
+      this.island.lastChild.style.opacity = 0;
+    },
     roomClick(roomid, force=false) {
       if (this.subroom && !force) return;
       else this.subroom = true;
@@ -95,7 +120,11 @@ export default {
         .get('https://api.nana7mi.link/live/'+roomid)
         .then(response => response.data.lives)
         .then(lives => {
-          if (!lives) return;
+          if (!lives) {
+            this.open('<span style="font-size: 75px">房间号不存在</span>');
+            setTimeout(this.close, 3000);
+            return;
+          };
           document.getElementById('roomid').scrollIntoView({behavior: 'smooth'})
           var rooms = document.getElementsByClassName("live")
           Array.from(rooms).forEach(
@@ -120,9 +149,6 @@ export default {
         .catch(error => console.log(error));
     },
     moveSider() {
-      var tt = new Date().getTime();
-      if (tt - this.siderMove > 505) this.siderMove = tt;
-      else return;
       this.siderStatus ^= 1;
       this.main.style.paddingLeft = this.siderStatus *  20 + "%";
       if (this.sider.offsetWidth / document.body.clientWidth < 0.3) {

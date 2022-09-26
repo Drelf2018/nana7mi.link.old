@@ -18,4 +18,17 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './index.css'
 
-createApp(App).mount('#app')
+var app = createApp(App)
+
+app.config.globalProperties.throttle = function(fn, delay=500) {
+    var flag = new Date().getTime();
+    return function(...arg) {
+        var tt = new Date().getTime();
+        if (tt - flag >= delay) {
+            fn.call(this, ...arg);
+            flag = tt;
+        }
+    }
+}
+
+app.mount('#app')

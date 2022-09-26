@@ -1,11 +1,11 @@
 <template>
   <nav @click="ldd">
     <a href="/">🏠</a>
-    <div id="island" @mouseleave="close()">
-      <span style="font-size: 100px; opacity: 0; transition: all 0.5s;">灵动岛</span>
+    <div id="island" @mouseleave="leave()">
+      <span style="font-size: 75px; opacity: 0; transition: all 0.5s;">灵动岛</span>
     </div>
     <a :href="href">
-      <img class="eyes" :src="src" alt="eyes" @mouseenter="open()" >
+      <img class="eyes" :src="src" alt="eyes" @mouseenter="enter()" >
     </a>
     <a href="/about">❔</a>
   </nav>
@@ -16,31 +16,9 @@ export default {
   name: 'Nav',
   props: {
     href: String,
-    src: String
-  },
-  mounted() {
-    this.island = document.getElementById('island');
-  },
-  methods: {
-    open(w1="40%", w2="95%", h="40%", wait=300) {
-      if (document.body.clientWidth > 883) this.island.style.width = w1;
-      else this.island.style.width = w2;
-      this.island.style.boxShadow = "0 7px 10px grey";
-      this.plan = setTimeout(() => {
-        this.island.style.height = h;
-        this.island.lastChild.style.opacity = 1;
-      }, wait)
-    },
-    close() {
-      if (this.plan) {
-        clearInterval(this.plan);
-        this.plan = null;
-      }
-      this.island.style.boxShadow = "none";
-      this.island.style.width = "95px";
-      this.island.style.height = "40px";
-      this.island.lastChild.style.opacity = 0;
-    }
+    src: String,
+    enter: Function,
+    leave: Function
   }
 }
 </script>
