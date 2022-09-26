@@ -7,5 +7,5 @@ with open('.\\dist\\index.html', 'r', encoding='utf-8') as fp:
     with open('.\\dist\\index.html', 'w', encoding='utf-8') as f:
         f.write(content)
 open('.\\dist\\CNAME', 'w', encoding='utf-8').write('gh.nana7mi.link')
-commit = ' '.join(sys.argv[1:]) if len(sys.argv) > 1 else 'update'
+commit = ''.join(sys.argv[1:]) if len(sys.argv) > 1 else 'update'
 os.system('auto.bat '+commit)
