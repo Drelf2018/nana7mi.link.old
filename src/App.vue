@@ -16,7 +16,7 @@
       <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
       <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-        @input="event => this.selectName = event.target.value" @change="event => roomClick(event.target.value, true)">
+        @input="event => this.selectName = event.target.value" @keyup.enter.native="event => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
         @click="roomClick(room.room)"></Room>
     </div>
