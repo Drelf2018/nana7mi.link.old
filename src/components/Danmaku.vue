@@ -3,7 +3,7 @@
         <p v-for="dm in danmaku">
             {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
             <a class="username" :href="'https://space.bilibili.com/' + dm.uid">{{ dm.username }}</a>
-            &nbsp;&nbsp;{{ dm.msg }}
+            &nbsp;&nbsp;<span v-html="dm.msg"></span>
         </p>
     </div>
 </template>
