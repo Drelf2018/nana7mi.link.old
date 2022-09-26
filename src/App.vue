@@ -4,7 +4,7 @@
   <div class="view">
     <Sider id="sider" style="transition: all 0.5s" :callback="roomClick"></Sider>
     <div id="main">
-      <div class="sb">
+      <div class="gallery">
         <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
         <iframe class="roundShadow"
           src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1vJ411B7ng&cid=133606284&page=1" scrolling="no"
@@ -16,9 +16,10 @@
       <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
       <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-        @input="event => this.selectName = event.target.value" @keyup.enter.native="event => roomClick(event.target.value, true)">
+        @input="event => {this.selectName = event.target.value; this.danmaku = null;}" @keyup.enter.native="event => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
-        @click="roomClick(room.room)"></Room>
+        @click="roomClick(room)"></Room>
+      <Danmaku :danmaku="danmaku"></Danmaku>
     </div>
   </div>
 </template>
@@ -28,6 +29,7 @@ import Nav from './components/nav.vue';
 import Room from './components/Room.vue';
 import Swiper from './components/Swiper.vue';
 import Sider from './components/Sider.vue';
+import Danmaku from './components/Danmaku.vue';
 
 
 export default {
@@ -36,16 +38,16 @@ export default {
     Nav,
     Room,
     Swiper,
-    Sider
-  },
+    Sider,
+    Danmaku
+},
   mounted() {
     this.sider = document.getElementById('sider');
     this.main = document.getElementById('main');
     this.island = document.getElementById('island');
-    var that = this;
     axios
       .get('https://api.nana7mi.link/rooms')
-      .then(response => { that.rooms = response.data.rooms; that.subroom = false; that.allRooms = that.rooms; })
+      .then(response => { this.rooms = response.data.rooms; this.subroom = false; this.allRooms = this.rooms; })
       .catch(error => console.log(error));
   },
   data() {
@@ -63,7 +65,8 @@ export default {
       siderStatus: 0,
       move: this.throttle(this.moveSider, 500),
       subroom: false,
-      timestamp: Date.parse(new Date()) / 1000
+      timestamp: Date.parse(new Date()) / 1000,
+      danmaku: null
     }
   },
   computed: {
@@ -128,35 +131,54 @@ export default {
       this.island.style.height = "40px";
       this.island.lastChild.style.opacity = 0;
     },
+    updateRooms(newRooms=null, fn=null, after_fn=null) {
+      var rooms = document.getElementsByClassName("live")
+      Array.from(rooms).forEach(
+        (pp) => {
+          pp.style.opacity = 0;
+          pp.style.left = "100%";
+        }
+      )
+      if (newRooms) setTimeout(() => {
+        if (fn) fn();
+        this.rooms = newRooms;
+        if (after_fn) setTimeout(after_fn, 500);
+      }, 500);
+    },
     roomClick(roomid, force = false) {
-      if (this.subroom && !force) return;
-      if (!parseInt(roomid)) return;
-      axios
-        .get('https://api.nana7mi.link/live/' + roomid)
-        .then(response => response.data.lives)
-        .then(lives => {
-          if (!lives) {
-            this.open('<span style="font-size: 50px">房间号不存在</span>');
-            setTimeout(this.close, 3000);
-            return;
-          };
-          var rooms = document.getElementsByClassName("live")
-          Array.from(rooms).forEach(
-            (pp) => {
-              pp.style.opacity = 0;
-              pp.style.left = "100%";
+      if (this.subroom && !force) {
+        if (this.rooms.length == 1 && this.rooms[0] == roomid) return;
+        this.updateRooms([roomid])
+        axios
+          .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
+          .then(response => response.data.live.danmaku)
+          .then(danmaku => {
+            if (!danmaku) return;
+            this.danmaku = danmaku
+          })
+      } else {
+        if (!parseInt(roomid))
+          if (parseInt(roomid.room)) roomid = roomid.room
+          else return
+        axios
+          .get('https://api.nana7mi.link/live/' + roomid)
+          .then(response => response.data.lives)
+          .then(lives => {
+            if (!lives) {
+              this.open('<span style="font-size: 50px">房间号不存在</span>');
+              setTimeout(this.close, 3000);
+            } else {
+              var total = lives.length;
+              lives.forEach((value, index, arr) => value.index = total - index - 1);
+              this.updateRooms(
+                lives,
+                () => { this.selectName = null; this.subroom = true; },
+                () => document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' })
+              )
             }
-          )
-          setTimeout(() => {
-            this.selectName = null;
-            this.rooms = lives
-            this.subroom = true;
-            setTimeout(() => {
-              document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' });
-            }, 500)
-          }, 505)
-        })
-        .catch(error => console.log(error));
+          })
+          .catch(error => console.log(error));
+      }
     },
     moveSider() {
       this.siderStatus ^= 1;
@@ -227,7 +249,7 @@ export default {
   padding: 1px 0 0 0.5em;
   margin: 0 auto 1.34em;
   border: 1px solid #ced4da;
-  border-radius: 0.25em;
+  border-radius: 0.5em;
   transition: all 0.2s;
 }
 
@@ -248,7 +270,7 @@ export default {
   box-shadow: 0 7px 10px rgb(100, 100, 100);
 }
 
-.sb {
+.gallery {
   display: flex;
   justify-content: space-between;
   margin: 20px auto;
@@ -270,7 +292,7 @@ export default {
     padding-left: 0;
   }
 
-  .sb {
+  .gallery {
     display: none;
   }
 }

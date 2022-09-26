@@ -86,13 +86,13 @@ export default {
     margin-bottom: 1em;
     overflow: hidden;
     border-radius: 5px;
-    transition: all 0.5s;
+    transition: background-color 0.3s ease 0s, opacity 0.5s ease 0s, left 0.5s ease 0s;
     background-color: #FFF;
     box-shadow: 0 3px 1px -2px rgb(0 0 0 / 12%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 20%)
 }
 
 .live:hover {
-    background-color: #EFEFFA;
+    background-color: hsl(225, 100%, 97%);
 }
 
 .time {
