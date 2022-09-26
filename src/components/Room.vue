@@ -23,6 +23,18 @@ export default {
     props: {
         room: Object
     },
+    mounted() {
+        var self = document.getElementById(this.room.room + '_' + this.room.st);
+        setTimeout(() => {
+            self.style.opacity = 1;
+            self.style.left = "0%";
+        }, 1)
+    },
+    updated() {
+        var self = document.getElementById(this.room.room + '_' + this.room.st);
+        self.style.opacity = 1;
+        self.style.left = "0%";
+    },
     methods: {
         format(tt) {
             if (tt) return new Date(tt * 1000).Format("yyyy-MM-dd hh:mm:ss");

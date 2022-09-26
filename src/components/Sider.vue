@@ -93,7 +93,7 @@ export default {
     position: fixed;
     background-color: #FFF;
     border-right: 1px solid rgb(216, 222, 228);
-    z-index: 4;
+    z-index: 2;
 }
 
 @media screen and (max-width: 900px) {

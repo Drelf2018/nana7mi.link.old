@@ -50,7 +50,10 @@ export default {
                 }
             )
             setTimeout(() => {
-                document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
+                if (maxAlpha)
+                    document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
+                else
+                    document.getElementById('swiperBox').style.width = '300px';
             }, 300);
         },
         stop() {
@@ -123,7 +126,7 @@ export default {
     position: relative;
     border-radius: 10px;
     box-shadow: 0 7px 10px grey;
-    z-index: 2;
+    z-index: 1;
 }
 
 .btn {

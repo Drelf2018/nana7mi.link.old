@@ -6,15 +6,19 @@
     <div id="main">
       <div class="sb">
         <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
-        <iframe class="roundShadow" src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1vJ411B7ng&cid=133606284&page=1"
-          scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
-        <iframe class="roundShadow" src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1"
-          scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+        <iframe class="roundShadow"
+          src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1vJ411B7ng&cid=133606284&page=1" scrolling="no"
+          frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+        <iframe class="roundShadow"
+          src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no"
+          frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
       </div>
       <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
-      <input id="roomid" type="text" placeholder="输入房间号并回车查询指定直播间" @change.lazy="(event) => roomClick(event.target.value, true)">
-      <Room v-for="room in roomsRecently" style="left: 0" :room="room" @click="roomClick(room.room)"></Room>
+      <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
+        @input="event => this.selectName = event.target.value" @change="event => roomClick(event.target.value, true)">
+      <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
+        @click="roomClick(room.room)"></Room>
     </div>
   </div>
 </template>
@@ -41,7 +45,7 @@ export default {
     var that = this;
     axios
       .get('https://api.nana7mi.link/rooms')
-      .then(response => that.rooms = response.data.rooms)
+      .then(response => { that.rooms = response.data.rooms; that.subroom = false; that.allRooms = that.rooms; })
       .catch(error => console.log(error));
   },
   data() {
@@ -55,6 +59,7 @@ export default {
         '直播只是工作吗直播只是工作吗直播只是工作吗？'
       ],
       qtd: 0,
+      selectName: null,
       siderStatus: 0,
       move: this.throttle(this.moveSider, 500),
       subroom: false,
@@ -69,7 +74,17 @@ export default {
         ) - this.qtd
       ];
     },
-    roomsRecently() { return this.rooms.filter(room => this.subroom || (this.timestamp - room.st <= 604800)) },
+    roomsRecently() {
+      if (!this.selectName)
+        return this.rooms.filter(room => this.subroom || (this.timestamp - room.st <= 604800))
+      else {
+        this.subroom = false;
+        return this.allRooms.filter(room => room.username.includes(this.selectName)
+          || room.room.toString().includes(this.selectName)
+          || room.uid.toString().includes(this.selectName)
+        )
+      }
+    },
     bannerFilter() {
       function Banner(link, url) {
         this.link = link;
@@ -89,7 +104,7 @@ export default {
     }
   },
   methods: {
-    open(inner=null, w1="40%", w2="95%", h="40%", wait=300) {
+    open(inner = null, w1 = "25%", w2 = "95%", h = "30%", wait = 300) {
       if (inner) {
         this.island.innerHTML = inner;
         this.island.lastChild.style.opacity = 0;
@@ -113,19 +128,18 @@ export default {
       this.island.style.height = "40px";
       this.island.lastChild.style.opacity = 0;
     },
-    roomClick(roomid, force=false) {
+    roomClick(roomid, force = false) {
       if (this.subroom && !force) return;
-      else this.subroom = true;
+      if (!parseInt(roomid)) return;
       axios
-        .get('https://api.nana7mi.link/live/'+roomid)
+        .get('https://api.nana7mi.link/live/' + roomid)
         .then(response => response.data.lives)
         .then(lives => {
           if (!lives) {
-            this.open('<span style="font-size: 75px">房间号不存在</span>');
+            this.open('<span style="font-size: 50px">房间号不存在</span>');
             setTimeout(this.close, 3000);
             return;
           };
-          document.getElementById('roomid').scrollIntoView({behavior: 'smooth'})
           var rooms = document.getElementsByClassName("live")
           Array.from(rooms).forEach(
             (pp) => {
@@ -134,30 +148,26 @@ export default {
             }
           )
           setTimeout(() => {
+            this.selectName = null;
             this.rooms = lives
+            this.subroom = true;
             setTimeout(() => {
-              var rooms = document.getElementsByClassName("live")
-              Array.from(rooms).forEach(
-                (pp) => {
-                  pp.style.opacity = 1;
-                  pp.style.left = "0%";
-                }
-              )
-            }, 505)
+              document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' });
+            }, 500)
           }, 505)
         })
         .catch(error => console.log(error));
     },
     moveSider() {
       this.siderStatus ^= 1;
-      this.main.style.paddingLeft = this.siderStatus *  20 + "%";
+      this.main.style.paddingLeft = this.siderStatus * 20 + "%";
       if (this.sider.offsetWidth / document.body.clientWidth < 0.3) {
         if (this.siderStatus == 1) {
           this.sider.style.transition = "none";
-          this.sider.style.left =  "-20%";
+          this.sider.style.left = "-20%";
           setTimeout(() => {
             this.sider.style.transition = "all 0.5s";
-            this.sider.style.left =  "0%";
+            this.sider.style.left = "0%";
           }, 30)
         } else {
           this.sider.style.left = "-20%";
@@ -180,9 +190,9 @@ export default {
   left: 0.5em;
   top: 0.5em;
   position: fixed;
-  color: #F5F5F7;
+  color: #FFF;
   font-size: 1.8em;
-  z-index: 6;
+  z-index: 4;
   transition: all 0.3s;
 }
 
@@ -259,6 +269,7 @@ export default {
     width: 75%;
     padding-left: 0;
   }
+
   .sb {
     display: none;
   }

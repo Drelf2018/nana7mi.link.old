@@ -32,7 +32,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  z-index: 4;
+  z-index: 3;
 }
 
 #island {
