@@ -97,7 +97,7 @@ export default {
       var res = [
         new Banner(
           "https://www.bilibili.com/video/BV1tG411g7Fo",
-          "http://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png"
+          "https://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png"
         ),
         new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
         new Banner("", "esu2.png"),
@@ -140,13 +140,11 @@ export default {
           pp.style.left = "100%";
         }
       )
-      console.log('before');
       if (beforeFn) beforeFn();
       if (newRooms) setTimeout(() => {
-        console.log('now');
         this.rooms = newRooms;
         if (immediatelyFn) immediatelyFn();
-        if (afterFn) setTimeout(() => {afterFn();console.log('after');}, 500);
+        if (afterFn) setTimeout(afterFn, 500);
       }, 500);
     },
     roomClick(roomid, force = false) {

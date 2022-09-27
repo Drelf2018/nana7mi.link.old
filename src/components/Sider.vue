@@ -84,6 +84,7 @@ export default {
     margin: auto 0;
     padding: 0 0.2em;
     font-size: 1.8em;
+    transition: all 0.1s;
 }
 
 .hidden-sider {
