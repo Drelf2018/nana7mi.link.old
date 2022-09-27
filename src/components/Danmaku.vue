@@ -1,5 +1,5 @@
 <template>
-    <div id="controler" style="opacity: 0;left: 100%;">
+    <div v-if="danmaku" id="controler" style="opacity: 0;left: 100%;">
         <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in button" @click="btn.status ^= 1">
             <div style="display: inline;">
                 <strong>{{ btn.name }}</strong><br />
@@ -56,8 +56,11 @@ export default {
         if (this.danmaku) {
             self.style.opacity = 1;
             self.style.left = "0%";
-            ct.style.opacity = 1;
-            ct.style.left = "0%";
+            setTimeout(()=>{
+                ct.style.opacity = 1;
+                ct.style.left = "0%";
+            }, 1)
+            
         } else {
             this.pos = 100;
             for (var i=0; i<this.button.length;i++) this.button[i].status = 0;
@@ -87,7 +90,6 @@ export default {
     display: flex;
     justify-content: space-around;
     transition: all 0.5s;
-    overflow: hidden;
 }
 
 .selector {
@@ -118,6 +120,6 @@ export default {
 .danmaku {
     padding: 0 1em;
     transition: all 0.5s;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 </style>
