@@ -87,7 +87,7 @@ export default {
     display: flex;
     justify-content: space-around;
     transition: all 0.5s;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .selector {

@@ -90,7 +90,8 @@ export default {
 }
 
 .live {
-    padding: 1em; 
+    padding: 1em;
+    overflow: hidden;
     transition: background-color 0.2s ease 0s, opacity 0.5s ease 0s, left 0.5s ease 0s;
 }
 
