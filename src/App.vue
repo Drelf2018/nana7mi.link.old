@@ -1,4 +1,5 @@
 <template>
+  <a id="top"></a>
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :enter="open" :leave="close"></Nav>
   <ion-icon class="menu" name="menu-outline" @click="move"></ion-icon>
   <div class="view">
@@ -131,7 +132,7 @@ export default {
       this.island.style.height = "40px";
       this.island.lastChild.style.opacity = 0;
     },
-    updateRooms(newRooms=null, fn=null, after_fn=null) {
+    updateRooms(newRooms=null, beforeFn=null, immediatelyFn=null, afterFn=null) {
       var rooms = document.getElementsByClassName("live")
       Array.from(rooms).forEach(
         (pp) => {
@@ -139,23 +140,25 @@ export default {
           pp.style.left = "100%";
         }
       )
+      console.log('before');
+      if (beforeFn) beforeFn();
       if (newRooms) setTimeout(() => {
-        if (fn) fn();
+        console.log('now');
         this.rooms = newRooms;
-        if (after_fn) setTimeout(after_fn, 500);
+        if (immediatelyFn) immediatelyFn();
+        if (afterFn) setTimeout(() => {afterFn();console.log('after');}, 500);
       }, 500);
     },
     roomClick(roomid, force = false) {
       if (this.subroom && !force) {
         if (this.rooms.length == 1 && this.rooms[0] == roomid) return;
-        this.updateRooms([roomid])
-        axios
-          .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
-          .then(response => response.data.live.danmaku)
-          .then(danmaku => {
-            if (!danmaku) return;
-            this.danmaku = danmaku
-          })
+        this.updateRooms([roomid],
+          () => document.getElementById('top').scrollIntoView({ behavior: 'smooth' }),
+          () => {
+            axios
+              .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
+              .then(response => this.danmaku = response.data.live.danmaku)
+          }, null)
       } else {
         if (!parseInt(roomid))
           if (parseInt(roomid.room)) roomid = roomid.room
@@ -172,6 +175,7 @@ export default {
               lives.forEach((value, index, arr) => value.index = total - index - 1);
               this.updateRooms(
                 lives,
+                null,
                 () => { this.selectName = null; this.subroom = true; },
                 () => document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' })
               )

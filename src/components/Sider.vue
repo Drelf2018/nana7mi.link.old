@@ -89,7 +89,7 @@ export default {
 .hidden-sider {
     top: 56px;
     width: 20%;
-    height: calc(100vh - 56px);
+    height: calc(200vh - 56px);
     position: fixed;
     background-color: #FFF;
     border-right: 1px solid rgb(216, 222, 228);
