@@ -9,7 +9,8 @@
                         <div style="display: inline;">
                             <a href="https://github.com/Drelf2018/nana7mi.link">
                                 <strong>前端</strong><br />
-                                <span style="color: grey;">VUE 3</span></a>
+                                <span style="color: grey;">VUE 3</span>
+                            </a>
                         </div>
                     </div>
                     <div class="link">
@@ -17,7 +18,8 @@
                         <div style="display: inline;">
                             <a href="https://github.com/Drelf2018/api.nana7mi.link">
                                 <strong>后端</strong><br />
-                                <span style="color: grey;">PY 3.10</span></a>
+                                <span style="color: grey;">PY 3.10</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -40,8 +42,14 @@
 
             <div class="content">
                 <h2 style="margin-top: 0.7em; margin-bottom: 0.3em">关于</h2>
-                随便说点什么吧。<br />
-                <em>鼠标放在最上面的眼睛试试？</em>
+                一时兴起写的弹幕站，起因是原来用 
+                <a class="username" href="https://github.com/Drelf2018/api.nana7mi.link">Python</a>
+                 写的太卡了。<br />
+                一口气把 Html、CSS、JS、Vue 都看完了，然后尝试着自己写了这个，最后只能说勉勉强强吧。<br />
+                关于收录的主播，如果你有想添加的主播，可以在 Github 上本仓库提交 
+                <a class="username" href="https://github.com/Drelf2018/nana7mi.link/issues">Issues</a> 。<br />
+                如果我看到了会去判断是否要添加，谢谢理解。<br /><br />
+                <span style="color: #F5F5F7"><em>鼠标放在最上面的眼睛试试？</em></span>
             </div>
         </div>
     </div>

@@ -54,20 +54,17 @@ export default {
         var self = document.getElementById("danmaku");
         var ct = document.getElementById('controler');
         if (this.danmaku) {
-            self.style.opacity = 1;
+            self.style.opacity = 1;       
             self.style.left = "0%";
             setTimeout(()=>{
                 ct.style.opacity = 1;
                 ct.style.left = "0%";
             }, 1)
-            
         } else {
             this.pos = 100;
             for (var i=0; i<this.button.length;i++) this.button[i].status = 0;
             self.style.opacity = 0;
             self.style.left = "100%";
-            ct.style.opacity = 0;
-            ct.style.left = "100%";
         }
     },
     mounted() {

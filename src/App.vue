@@ -1,7 +1,6 @@
 <template>
   <a id="top"></a>
-  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :enter="open" :leave="close"></Nav>
-  <ion-icon class="menu" name="menu-outline" @click="move"></ion-icon>
+  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :enter="open" :leave="close"></Nav>
   <div class="view">
     <Sider id="sider" style="transition: all 0.5s" :callback="roomClick"></Sider>
     <div id="main">
@@ -26,7 +25,7 @@
 </template>
 
 <script>
-import Nav from './components/nav.vue';
+import Nav from './components/Nav.vue';
 import Room from './components/Room.vue';
 import Swiper from './components/Swiper.vue';
 import Sider from './components/Sider.vue';
@@ -108,9 +107,9 @@ export default {
     }
   },
   methods: {
-    open(inner = null, w1 = "25%", w2 = "95%", h = "30%", wait = 300) {
+    open(inner = null, w1 = "35%", w2 = "95%", h = "40%", wait = 300) {
       if (inner) {
-        this.island.innerHTML = inner;
+        this.island.lastChild.innerHTML = inner;
         this.island.lastChild.style.opacity = 0;
         this.island.lastChild.style.transition = "all 0.5s";
       }
@@ -119,7 +118,7 @@ export default {
       this.island.style.boxShadow = "0 7px 10px grey";
       this.plan = setTimeout(() => {
         this.island.style.height = h;
-        this.island.lastChild.style.opacity = 1;
+        Array.from(this.island.children).forEach(pp => pp.style.opacity = 1)
       }, wait)
     },
     close() {
@@ -130,7 +129,7 @@ export default {
       this.island.style.boxShadow = "none";
       this.island.style.width = "95px";
       this.island.style.height = "40px";
-      this.island.lastChild.style.opacity = 0;
+      Array.from(this.island.children).forEach(pp => pp.style.opacity = 0)
     },
     updateRooms(newRooms=null, beforeFn=null, immediatelyFn=null, afterFn=null) {
       var rooms = document.getElementsByClassName("live")
@@ -210,20 +209,6 @@ export default {
 </script>
 
 <style>
-.menu {
-  left: 0.5em;
-  top: 0.5em;
-  position: fixed;
-  color: #FFF;
-  font-size: 1.8em;
-  z-index: 4;
-  transition: all 0.3s;
-}
-
-.menu:hover {
-  opacity: 0.8;
-}
-
 .view {
   margin: 0;
   padding: 0;
