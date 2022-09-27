@@ -85,15 +85,16 @@ export default {
 #controler {
     position: relative;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     transition: all 0.5s;
+    overflow-x: hidden;
 }
 
 .selector {
     padding: 0.3em 0 0.3em 1em;
     margin-bottom: 1em;
     /* margin-right: 1em; */
-    width: 22%;
+    width: 18%;
     background-color: #FFF;
 }
 
@@ -117,5 +118,6 @@ export default {
 .danmaku {
     padding: 0 1em;
     transition: all 0.5s;
+    overflow-x: hidden;
 }
 </style>
