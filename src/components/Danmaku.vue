@@ -68,7 +68,7 @@ export default {
             if (scrollTop + clientHeight >= scrollHeight - 100) this.pos += 100;
         },
         analyse(content) {
-            if (!content) return (msg) => ture
+            if (!content) return (msg) => true
             content = content.split(" ")
             content.forEach((val, idx, arr) => arr[idx]=val.split("+"))
             return function(msg) {
