@@ -1,7 +1,7 @@
 <template>
   <nav>
     <ion-icon class="menu" name="menu-outline" @click="move"></ion-icon>
-    <div id="island" @mouseleave="leave()">
+    <div id="island" :class="status ? 'open' : 'close'" @mouseleave="status = 0">
       <div id="phone">
         <div style="height: 100%;display: flex;align-items: center;">
           <ion-icon name="logo-apple" id="github"></ion-icon>
@@ -16,14 +16,11 @@
           </div>
         </div>
       </div>
-      <div>
-        <span style="font-size: 75px; opacity: 0; transition: all 0.5s;">灵动岛</span>
-      </div>
+      <div id="inner" style="z-index: 1;" :class="status ? 'inner-open' : 'inner-close'" v-html="inner"></div>
     </div>
     <a :href="href">
-      <img class="eyes" :src="src" alt="eyes" @mouseenter="enter()">
+      <img class="eyes" :src="src" alt="eyes" @mouseenter="status = 1">
     </a>
-    <!-- <a href="/about">❔</a> -->
   </nav>
 </template>
 
@@ -34,8 +31,8 @@ export default {
     href: String,
     src: String,
     move: Function,
-    enter: Function,
-    leave: Function
+    inner: String,
+    status: Number
   }
 }
 </script>
@@ -76,25 +73,52 @@ nav {
   height: 45px;
   background-color: rgb(246, 248, 250);
   border-bottom: 3px solid rgb(33, 37, 41);
-  transition: all 0.5s;
+  transition: all 0.3s;
+  z-index: 2;
 }
 
 #island {
   position: fixed;
   top: 0;
   margin: 0.5em auto;
-  width: 95px;
-  height: 40px;
   border-radius: 7px;
-  transition: all 0.3s;
   background-color: #FFF;
-  box-shadow: none;
   display: flex;
   justify-content: space-around;
   align-items: center;
   overflow: hidden;
   /* border: 1px solid #000; */
   z-index: 5;
+}
+
+.open {
+  transition: width 0.3s ease 0s, height 0.3s ease 0.3s, box-shadow 0.3s ease 0s;
+  width: 35%;
+  height: 40%;
+  box-shadow: 0 7px 10px grey;
+}
+
+.close {
+  transition: all 0.3s;
+  width: 95px;
+  height: 40px;
+  box-shadow: none;
+}
+
+.inner-open {
+  transition: all 0.3s ease 0.3s;
+  opacity: 1;
+}
+
+.inner-close {
+  transition: all 0.3s;
+  opacity: 0;
+}
+
+@media screen and (max-width: 900px) {
+  .open {
+    width: 95%;
+  }
 }
 
 .eyes {

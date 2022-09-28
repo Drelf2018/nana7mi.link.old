@@ -1,5 +1,5 @@
 <template>
-    <div class="hidden-sider" style="left: -100%">
+    <div :class="[status ? 'sider-open' : 'sider-close' ,'hidden-sider']">
         <div style="overflow: auto; height: 100%">
             <div class="content">
                 <h2 style="margin-top: 0.7em; margin-bottom: 0.3em">本页面</h2>
@@ -58,6 +58,9 @@
 <script>
 export default {
     name: 'Sider',
+    props: {
+        status: Number
+    },
     data() {
         return {
             repositories: {
@@ -75,6 +78,16 @@ export default {
 </script>
 
 <style>
+.sider-open {
+    transition: all 0.5s cubic-bezier(0, 0.9, 0.1, 1) 0s;
+    left: 0%;
+}
+
+.sider-close {
+    transition: all 0.5s cubic-bezier(0.1, 0, 1, 0.1) 0s;
+    left: -100%;
+}
+
 .link {
     display: flex;
     width: 48%;
@@ -108,6 +121,7 @@ export default {
 @media screen and (max-width: 900px) {
     .hidden-sider {
         width: 100%;
+        transition: all 0.5s;
     }
 }
 

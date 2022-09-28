@@ -1,9 +1,9 @@
 <template>
   <a id="top"></a>
-  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :enter="open" :leave="close"></Nav>
+  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :inner="inner" :status="navStatus"></Nav>
   <div class="view">
-    <Sider id="sider" style="transition: all 0.5s" :callback="roomClick"></Sider>
-    <div id="main">
+    <Sider id="sider" :status="siderStatus"></Sider>
+    <div id="main" :style="'padding-left: ' + siderStatus * 20 + '%;'">
       <div class="gallery">
         <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
         <iframe class="roundShadow"
@@ -16,7 +16,8 @@
       <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
       <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
       <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-        @input="event => {this.selectName = event.target.value; this.danmaku = null;}" @keyup.enter.native="event => roomClick(event.target.value, true)">
+        @input="event => {this.selectName = event.target.value; this.danmaku = null;}"
+        @keyup.enter.native="event => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
         @click="roomClick(room)"></Room>
       <Danmaku :danmaku="danmaku"></Danmaku>
@@ -42,9 +43,6 @@ export default {
     Danmaku
 },
   mounted() {
-    this.sider = document.getElementById('sider');
-    this.main = document.getElementById('main');
-    this.island = document.getElementById('island');
     axios
       .get('https://api.nana7mi.link/rooms')
       .then(response => { this.rooms = response.data.rooms; this.subroom = false; this.allRooms = this.rooms; })
@@ -63,7 +61,9 @@ export default {
       qtd: 0,
       selectName: null,
       siderStatus: 0,
-      move: this.throttle(this.moveSider, 500),
+      inner: '<span style="font-size: 75px; opacity: 1; transition: all 0.5s;">灵动岛</span>',
+      navStatus: 0,
+      move: this.throttle(() => this.siderStatus ^= 1, 500),
       subroom: false,
       timestamp: Date.parse(new Date()) / 1000,
       danmaku: null
@@ -79,12 +79,14 @@ export default {
     },
     roomsRecently() {
       if (!this.selectName)
-        return this.rooms.filter(room => this.subroom || (this.timestamp - room.st <= 604800))
+        if (this.subroom) return this.rooms
+        else return this.rooms.filter(room =>  this.timestamp - room.st <= 604800)
       else {
         this.subroom = false;
         return this.allRooms.filter(room => room.username.includes(this.selectName)
-          || room.room.toString().includes(this.selectName)
-          || room.uid.toString().includes(this.selectName)
+            || room.room.toString().includes(this.selectName)
+            || room.uid.toString().includes(this.selectName)
+            || room.title.includes(this.selectName)
         )
       }
     },
@@ -98,6 +100,10 @@ export default {
           "https://www.bilibili.com/video/BV1tG411g7Fo",
           "https://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png"
         ),
+        new Banner(
+          "https://www.bilibili.com/video/BV1T24y1R7wd",
+          "http://i1.hdslb.com/bfs/archive/ab9738d7aee96044183b61c7dd9c95eb1ec17ed1.jpg"
+        ),
         new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
         new Banner("", "esu2.png"),
         new Banner("", "esu3.png")
@@ -107,30 +113,6 @@ export default {
     }
   },
   methods: {
-    open(inner = null, w1 = "35%", w2 = "95%", h = "40%", wait = 300) {
-      if (inner) {
-        this.island.lastChild.innerHTML = inner;
-        this.island.lastChild.style.opacity = 0;
-        this.island.lastChild.style.transition = "all 0.5s";
-      }
-      if (document.body.clientWidth > 883) this.island.style.width = w1;
-      else this.island.style.width = w2;
-      this.island.style.boxShadow = "0 7px 10px grey";
-      this.plan = setTimeout(() => {
-        this.island.style.height = h;
-        Array.from(this.island.children).forEach(pp => pp.style.opacity = 1)
-      }, wait)
-    },
-    close() {
-      if (this.plan) {
-        clearInterval(this.plan);
-        this.plan = null;
-      }
-      this.island.style.boxShadow = "none";
-      this.island.style.width = "95px";
-      this.island.style.height = "40px";
-      Array.from(this.island.children).forEach(pp => pp.style.opacity = 0)
-    },
     updateRooms(newRooms=null, beforeFn=null, immediatelyFn=null, afterFn=null) {
       var rooms = document.getElementsByClassName("live")
       Array.from(rooms).forEach(
@@ -165,8 +147,9 @@ export default {
           .then(response => response.data.lives)
           .then(lives => {
             if (!lives) {
-              this.open('<span style="font-size: 50px">房间号不存在</span>');
-              setTimeout(this.close, 3000);
+              this.inner = '<span style="font-size: 50px">房间号不存在</span>';
+              this.navStatus = 1;
+              setTimeout(() => this.navStatus = 0, 3000);
             } else {
               var total = lives.length;
               lives.forEach((value, index, arr) => value.index = total - index - 1);
@@ -179,29 +162,6 @@ export default {
             }
           })
           .catch(error => console.log(error));
-      }
-    },
-    moveSider() {
-      this.siderStatus ^= 1;
-      this.main.style.paddingLeft = this.siderStatus * 20 + "%";
-      if (this.sider.offsetWidth / document.body.clientWidth < 0.3) {
-        if (this.siderStatus == 1) {
-          this.sider.style.transition = "none";
-          this.sider.style.left = "-20%";
-          setTimeout(() => {
-            this.sider.style.transition = "all 0.5s";
-            this.sider.style.left = "0%";
-          }, 30)
-        } else {
-          this.sider.style.left = "-20%";
-          setTimeout(() => {
-            this.sider.style.transition = "none";
-            this.sider.style.left = "-100%";
-          }, 500)
-        }
-      } else {
-        this.sider.style.transition = "all 0.5s";
-        this.sider.style.left = (this.siderStatus ^ 1) * -100 + "%";
       }
     }
   }

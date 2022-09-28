@@ -5,10 +5,9 @@
                 <strong>{{ btn.name }}</strong><br />
                 <span style="color: grey;">{{ btn.status ? '是' : '否'}}</span>
             </div>
-            <!-- <ion-icon id="github" name="checkmark-circle-outline" :style="'opacity: '+btn.status"></ion-icon> -->
         </div>
     </div>
-    <div class="show-block danmaku" id="danmaku" style="opacity: 0;left: 100%;">
+    <div class="show-block" id="danmaku" style="opacity: 0;left: 100%;">
         <p v-for="dm in splitDanmaku">
             {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
             <a class="username" :href="'https://space.bilibili.com/' + dm.uid">{{ dm.username }}</a>
@@ -114,7 +113,7 @@ export default {
     text-decoration: underline;
 }
 
-.danmaku {
+#danmaku {
     padding: 0 1em;
     transition: all 0.5s;
     overflow: hidden;
