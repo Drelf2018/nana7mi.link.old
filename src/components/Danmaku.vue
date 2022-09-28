@@ -13,7 +13,7 @@ export default {
     name: 'Danmaku',
     props: {
         danmaku: Object,
-        button: [Object]
+        button: [Object],
     },
     data() {
         return {
@@ -50,6 +50,7 @@ export default {
         if (this.danmaku) {
             self.style.opacity = 1;       
             self.style.left = "0%";
+            setTimeout(() => this.button[5].mountedWait=1, 1000);
         } else {
             this.pos = 100;
             for (var i=0; i<this.button.length;i++) this.button[i].status = 0;

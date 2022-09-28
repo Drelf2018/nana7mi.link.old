@@ -84,7 +84,8 @@ export default {
         {name: '大航海', status: 0},
         {name: '醒目留言', status: 0},
         {maxPrice: null, status: 0},
-        {content: null}
+        {content: null},
+        {mountedWait: 0}
       ]
     }
   },
@@ -158,49 +159,55 @@ export default {
     },
     roomClick(roomid, force = false) {
       if (this.subroom && !force) {
-        if (this.rooms.length == 1 && this.rooms[0] == roomid) return;
-        this.updateRooms([roomid], () => {
-          axios
-            .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
-            .then(response => this.danmaku = response.data.live.danmaku)
-        })
-      } else {
-        this.danmaku = null;
-        if (!parseInt(roomid))
-          if (parseInt(roomid.room)) roomid = roomid.room
-          else {
-            switch (roomid) {
-              case "esu":
-                this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
-                break;
-              case "/user":
-                var inp = document.getElementById("roomid");
-                inp.placeholder = "输入被查询人 UID";
-                inp.value = '';
-                return
-              default:
-                return;
-            }
-            clearInterval(this.innerPlan);
-            this.navStatus = 1;
-            this.innerPlan = setTimeout(() => this.navStatus = 0, 3000);
-          }
-        axios
-          .get('https://api.nana7mi.link/live/' + roomid)
-          .then(response => response.data.lives)
-          .then(lives => {
-            if (!lives) {
-              this.inner = '<span style="font-size: 50px">房间号不存在</span>';
-              this.navStatus = 1;
-              setTimeout(() => this.navStatus = 0, 3000);
-            } else {
-              var total = lives.length;
-              lives.forEach((value, index, arr) => value.index = total - index - 1);
-              this.updateRooms(lives, () => { this.selectName = null; this.subroom = true; })
-            }
+        if (this.rooms.length == 1 && this.rooms[0] == roomid) {
+          if (this.button[5].mountedWait) {roomid = roomid.room; this.button[5].mountedWait=0;}
+          else return
+        }
+        else {
+          this.updateRooms([roomid], () => {
+            axios
+              .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
+              .then(response => this.danmaku = response.data.live.danmaku)
           })
-          .catch(error => console.log(error));
+          return;
+        }
       }
+
+      this.danmaku = null;
+      if (!parseInt(roomid))
+        if (parseInt(roomid.room)) roomid = roomid.room
+        else {
+          switch (roomid) {
+            case "esu":
+              this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
+              break;
+            case "/user":
+              var inp = document.getElementById("roomid");
+              inp.placeholder = "输入被查询人 UID";
+              inp.value = '';
+              return
+            default:
+              return;
+          }
+          clearInterval(this.innerPlan);
+          this.navStatus = 1;
+          this.innerPlan = setTimeout(() => this.navStatus = 0, 3000);
+        }
+      axios
+        .get('https://api.nana7mi.link/live/' + roomid)
+        .then(response => response.data.lives)
+        .then(lives => {
+          if (!lives) {
+            this.inner = '<span style="font-size: 50px">房间号不存在</span>';
+            this.navStatus = 1;
+            setTimeout(() => this.navStatus = 0, 3000);
+          } else {
+            var total = lives.length;
+            lives.forEach((value, index, arr) => value.index = total - index - 1);
+            this.updateRooms(lives, () => { this.selectName = null; this.subroom = true; })
+          }
+        })
+        .catch(error => console.log(error));
     }
   }
 }
