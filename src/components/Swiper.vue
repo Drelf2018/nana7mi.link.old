@@ -19,7 +19,7 @@
 export default {
     name: 'Swiper',
     props: {
-        speed: Number,
+        speed: String,
         height: String,
         banner: null
     },

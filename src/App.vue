@@ -8,20 +8,25 @@
           <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
           <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
           <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-            @input="event => {this.selectName = event.target.value; this.danmaku = null;}"
+            @input="event => {this.selectName = event.target.value; this.danmaku = null; this.button[3].maxPrice = ''; this.button[4].content = '';}"
             @keyup.enter.native="event => roomClick(event.target.value, true)">
           <!-- 目前可用指令：esu -->
-          <div id="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
-            <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in (danmaku ? button : [])" @click="btn.status ^= 1">
+          
+          <div class="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
+            <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in (danmaku ? button.slice(0, 3) : [])" @click="btn.status ^= 1">
               <div style="display: inline;">
                 <strong>{{ btn.name }}</strong><br />
                 <span style="color: grey;">{{ btn.status ? '是' : '否'}}</span>
               </div>
             </div>
           </div>
+          <div class="controler" :style="'align-items: center;' + (danmaku ? 'opacity: 1;' : 'opacity: 0;')">
+            <input v-if="danmaku" v-model="button[3].maxPrice" type="number" style="width: 48%;margin: 0px;" placeholder="大于等于指定金额，不填默认为零。">
+            <input v-if="danmaku" @keyup.enter.native="queryHelp" type="text" style="width: 48%;margin: 0px;" placeholder="内容筛选，高阶用法输入 /help 查看。">
+          </div>
         </div>
         <div class="show-block" id="gallery" style="margin-left: 1em;">
-          <Swiper speed=7000 height="225px" :banner="bannerFilter"></Swiper>
+          <Swiper speed=7000 height="229px" :banner="bannerFilter"></Swiper>
         </div>
       </div>
       <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
@@ -75,10 +80,11 @@ export default {
       timestamp: Date.parse(new Date()) / 1000,
       danmaku: null,
       button: [
-        {name: '仅礼物', status: 0},
-        {name: '￥9.9 以上', status: 0},
-        {name: '￥19.9 以上', status: 0},
-        {name: '￥29.9 以上', status: 0},
+        {name: '礼物', status: 0},
+        {name: '大航海', status: 0},
+        {name: '醒目留言', status: 0},
+        {maxPrice: null, status: 0},
+        {content: null}
       ]
     }
   },
@@ -126,7 +132,18 @@ export default {
     }
   },
   methods: {
-    updateRooms(newRooms = null, beforeFn = null, immediatelyFn = null, afterFn = null) {
+    queryHelp(event) {
+      if (event.target.value != '/help')
+        this.button[4].content = event.target.value
+      else {
+        this.inner = '<span style="font-size: 25px;padding: 1em">用类似逻辑电路的格式约定搜索方式，例如：\
+          A B+C D 表示搜索同时包含 A 与 D 且包含 B 或 C 。\
+          即空格表示与、加号表示或。</span>';
+        this.navStatus = 1;
+        setTimeout(() => this.navStatus = 0, 10000);
+      }
+    },
+    updateRooms(newRooms = null, immediatelyFn = null) {
       var rooms = document.getElementsByClassName("live")
       Array.from(rooms).forEach(
         (pp) => {
@@ -134,33 +151,33 @@ export default {
           pp.style.left = "100%";
         }
       )
-      if (beforeFn) beforeFn();
       if (newRooms) setTimeout(() => {
         this.rooms = newRooms;
         if (immediatelyFn) immediatelyFn();
-        if (afterFn) setTimeout(afterFn, 500);
       }, 500);
     },
     roomClick(roomid, force = false) {
       if (this.subroom && !force) {
         if (this.rooms.length == 1 && this.rooms[0] == roomid) return;
-        this.updateRooms([roomid],
-          null,
-          // () => document.getElementById('top').scrollIntoView({ behavior: 'smooth' }),
-          () => {
-            axios
-              .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
-              .then(response => this.danmaku = response.data.live.danmaku)
-          }, null)
+        this.updateRooms([roomid], () => {
+          axios
+            .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
+            .then(response => this.danmaku = response.data.live.danmaku)
+        })
       } else {
+        this.danmaku = null;
         if (!parseInt(roomid))
           if (parseInt(roomid.room)) roomid = roomid.room
           else {
-            console.log(this.navStatus);
             switch (roomid) {
               case "esu":
                 this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
                 break;
+              case "/user":
+                var inp = document.getElementById("roomid");
+                inp.placeholder = "输入被查询人 UID";
+                inp.value = '';
+                return
               default:
                 return;
             }
@@ -179,13 +196,7 @@ export default {
             } else {
               var total = lives.length;
               lives.forEach((value, index, arr) => value.index = total - index - 1);
-              this.updateRooms(
-                lives,
-                null,
-                () => { this.selectName = null; this.subroom = true; },
-                null
-                // () => document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' })
-              )
+              this.updateRooms(lives, () => { this.selectName = null; this.subroom = true; })
             }
           })
           .catch(error => console.log(error));
@@ -214,7 +225,7 @@ export default {
   color: grey;
 }
 
-#roomid {
+input {
   display: block;
   box-sizing: border-box;
   width: 100%;
@@ -228,13 +239,13 @@ export default {
   transition: all 0.2s;
 }
 
-#roomid:focus {
+input:focus {
   border-color: #86b7fe;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
 
-#controler {
+.controler {
     position: relative;
     margin-top: 1em;
     display: flex;
@@ -244,9 +255,7 @@ export default {
 
 .selector {
     padding: 0.3em 0 0.3em 1em;
-    /* margin-bottom: 1em; */
-    /* margin-right: 1em; */
-    width: 18%;
+    width: 25%;
     background-color: #FFF;
 }
 

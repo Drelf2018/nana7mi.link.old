@@ -17,18 +17,28 @@ export default {
     },
     data() {
         return {
-            pos: 100
+            pos: 100,
+            Type: {
+                "SEND_GIFT": 0,
+                "GUARD_BUY": 1,
+                "SUPER_CHAT_MESSAGE": 2,
+                "DANMU_MSG": 3
+            }
         }
     },
     computed: {
         splitDanmaku() {
             if (this.danmaku)
-                if (this.button[0].status || this.button[1].status || this.button[2].status || this.button[3].status) {
-                    var maxPrice = this.button[3].status ? 29.9 : this.button[2].status ? 19.9 : this.button[1].status ? 9.9 : 0
+                if (this.button[0].status || this.button[1].status || this.button[2].status || this.button[3].maxPrice || this.button[4].content) {
+                    var all = !this.button[0].status && !this.button[1].status && !this.button[2].status
+                    var maxPrice = this.button[3].maxPrice ? this.button[3].maxPrice : 0
+                    var check = this.analyse(this.button[4].content)
+                    // console.log(check, check("脆"), check("脆1"), check("脆鲨12138"));
                     return this.danmaku.filter(
                         dm => {
-                            return (!this.button[0].status || dm.type != "DANMU_MSG")
-                                && (!maxPrice || dm.price > maxPrice)
+                            return (dm.price >= maxPrice)
+                                && (all || this.button[this.Type[dm.type]].status)
+                                && check(dm.username + dm.msg)
                         }
                     )
                 } else {
@@ -58,6 +68,20 @@ export default {
             const scrollHeight = document.documentElement.scrollHeight;
             if (scrollTop + clientHeight >= scrollHeight - 100) this.pos += 100;
         },
+        analyse(content) {
+            if (!content) return () => ture
+            content = content.split(" ")
+            content.forEach((val, idx, arr) => arr[idx]=val.split("+"))
+            return function(msg) {
+                var i = null, j = null;
+                for (i=0;i<content.length;i++) {
+                    var flag = false, wlist=content[i];
+                    for (j=0;j<wlist.length;j++) flag ||= msg.includes(wlist[j]);
+                    if (!flag) return false;
+                }
+                return true;
+            }
+        }
     }
 }
 </script>
