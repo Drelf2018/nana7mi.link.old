@@ -33,7 +33,6 @@ export default {
                     var all = !this.button[0].status && !this.button[1].status && !this.button[2].status
                     var maxPrice = this.button[3].maxPrice ? this.button[3].maxPrice : 0
                     var check = this.analyse(this.button[4].content)
-                    // console.log(check, check("脆"), check("脆1"), check("脆鲨12138"));
                     return this.danmaku.filter(
                         dm => {
                             return (dm.price >= maxPrice)
@@ -69,7 +68,7 @@ export default {
             if (scrollTop + clientHeight >= scrollHeight - 100) this.pos += 100;
         },
         analyse(content) {
-            if (!content) return () => ture
+            if (!content) return (msg) => ture
             content = content.split(" ")
             content.forEach((val, idx, arr) => arr[idx]=val.split("+"))
             return function(msg) {
