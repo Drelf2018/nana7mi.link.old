@@ -82,6 +82,7 @@ export default {
 
 .show-block {
     position: relative;
+    padding: 1em;
     margin-bottom: 1em;
     border-radius: 5px;
     background-color: #FFF;

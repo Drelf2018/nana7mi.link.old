@@ -4,11 +4,11 @@
     <div id="island" :class="status ? 'open' : 'close'" @mouseleave="status = 0">
       <div id="phone">
         <div style="height: 100%;display: flex;align-items: center;">
-          <ion-icon name="logo-apple" id="github"></ion-icon>
+          <ion-icon name="logo-apple" class="github"></ion-icon>
           <p style="padding-top: 0.25em;">Dynamic Island</p>
         </div>
         <div class="link" style="height: 75%;width: auto;margin-right: 1em;padding-right: 0.5em;align-items: center;">
-          <ion-icon name="logo-css3" id="github"></ion-icon>
+          <ion-icon name="logo-css3" class="github"></ion-icon>
           <div style="display: inline;">
             <a href="https://github.com/Drelf2018/nana7mi.link/blob/main/src/components/Nav.vue">
               Powered by <strong>CSS</strong>
@@ -94,7 +94,7 @@ nav {
 .open {
   transition: width 0.3s ease 0s, height 0.3s ease 0.3s, box-shadow 0.3s ease 0s;
   width: 35%;
-  height: 40%;
+  height: 50%;
   box-shadow: 0 7px 10px grey;
 }
 
@@ -103,6 +103,16 @@ nav {
   width: 95px;
   height: 40px;
   box-shadow: none;
+}
+
+#inner {
+  position: relative;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: calc(100% - 48px);
+  top: 24px;
 }
 
 .inner-open {

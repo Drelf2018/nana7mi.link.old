@@ -19,7 +19,7 @@
 export default {
     name: 'Swiper',
     props: {
-        speed: String,
+        speed: Number,
         height: String,
         banner: null
     },
@@ -125,12 +125,12 @@ export default {
     height: 250px;
     position: relative;
     border-radius: 10px;
-    box-shadow: 0 7px 10px grey;
+    /* box-shadow: 0 7px 10px grey; */
     z-index: 1;
 }
 
 .btn {
-    color: #FFF;
+    color: #F5F5F7;
     font-size: 40px;
     height: 20%;
     top: 40%;

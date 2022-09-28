@@ -1,12 +1,4 @@
 <template>
-    <div v-if="danmaku" id="controler" style="opacity: 0;left: 100%;">
-        <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in button" @click="btn.status ^= 1">
-            <div style="display: inline;">
-                <strong>{{ btn.name }}</strong><br />
-                <span style="color: grey;">{{ btn.status ? '是' : '否'}}</span>
-            </div>
-        </div>
-    </div>
     <div class="show-block" id="danmaku" style="opacity: 0;left: 100%;">
         <p v-for="dm in splitDanmaku">
             {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
@@ -20,17 +12,12 @@
 export default {
     name: 'Danmaku',
     props: {
-        danmaku: Object
+        danmaku: Object,
+        button: [Object]
     },
     data() {
         return {
-            pos: 100,
-            button: [
-                {name: '仅礼物', status: 0},
-                {name: '￥9.9 以上', status: 0},
-                {name: '￥19.9 以上', status: 0},
-                {name: '￥29.9 以上', status: 0},
-            ]
+            pos: 100
         }
     },
     computed: {
@@ -51,14 +38,9 @@ export default {
     },
     updated() {
         var self = document.getElementById("danmaku");
-        var ct = document.getElementById('controler');
         if (this.danmaku) {
             self.style.opacity = 1;       
             self.style.left = "0%";
-            setTimeout(()=>{
-                ct.style.opacity = 1;
-                ct.style.left = "0%";
-            }, 1)
         } else {
             this.pos = 100;
             for (var i=0; i<this.button.length;i++) this.button[i].status = 0;
@@ -81,30 +63,6 @@ export default {
 </script>
 
 <style>
-#controler {
-    position: relative;
-    display: flex;
-    justify-content: space-around;
-    transition: all 0.5s;
-}
-
-.selector {
-    padding: 0.3em 0 0.3em 1em;
-    margin-bottom: 1em;
-    /* margin-right: 1em; */
-    width: 18%;
-    background-color: #FFF;
-}
-
-.up {
-    background-color: #FFF;
-}
-
-.down {
-    background-color: hsl(196, 100%, 97%);
-    box-shadow: 0 1.5px 4px skyblue;
-}
-
 .username {
     color: rgb(13, 110, 253);
 }

@@ -1,26 +1,32 @@
 <template>
-  <a id="top"></a>
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :inner="inner" :status="navStatus"></Nav>
   <div class="view">
     <Sider id="sider" :status="siderStatus"></Sider>
     <div id="main" :style="'padding-left: ' + siderStatus * 20 + '%;'">
-      <div class="gallery">
-        <Swiper speed="7000" height="200px" :banner="bannerFilter"></Swiper>
-        <iframe class="roundShadow"
-          src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1vJ411B7ng&cid=133606284&page=1" scrolling="no"
-          frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
-        <iframe class="roundShadow"
-          src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no"
-          frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+      <div style="display: flex;margin-top: 1em;justify-content: space-between">
+        <div class="show-block" style="width: 100%;">
+          <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
+          <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
+          <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
+            @input="event => {this.selectName = event.target.value; this.danmaku = null;}"
+            @keyup.enter.native="event => roomClick(event.target.value, true)">
+          <!-- 目前可用指令：esu -->
+          <div id="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
+            <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in (danmaku ? button : [])" @click="btn.status ^= 1">
+              <div style="display: inline;">
+                <strong>{{ btn.name }}</strong><br />
+                <span style="color: grey;">{{ btn.status ? '是' : '否'}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="show-block" id="gallery" style="margin-left: 1em;">
+          <Swiper speed=7000 height="225px" :banner="bannerFilter"></Swiper>
+        </div>
       </div>
-      <h1 id="title" onselectstart="return false;"><span @click="qtd++">😎</span> nana7mi.link</h1>
-      <p id="subtitle"><strong><em>{{ selected }}</em></strong></p>
-      <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-        @input="event => {this.selectName = event.target.value; this.danmaku = null;}"
-        @keyup.enter.native="event => roomClick(event.target.value, true)">
       <Room v-for="room in roomsRecently" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
         @click="roomClick(room)"></Room>
-      <Danmaku :danmaku="danmaku"></Danmaku>
+      <Danmaku :danmaku="danmaku" :button="button"></Danmaku>
     </div>
   </div>
 </template>
@@ -41,7 +47,7 @@ export default {
     Swiper,
     Sider,
     Danmaku
-},
+  },
   mounted() {
     axios
       .get('https://api.nana7mi.link/rooms')
@@ -62,11 +68,18 @@ export default {
       selectName: null,
       siderStatus: 0,
       inner: '<span style="font-size: 75px; opacity: 1; transition: all 0.5s;">灵动岛</span>',
+      innerPlan: null,
       navStatus: 0,
       move: this.throttle(() => this.siderStatus ^= 1, 500),
       subroom: false,
       timestamp: Date.parse(new Date()) / 1000,
-      danmaku: null
+      danmaku: null,
+      button: [
+        {name: '仅礼物', status: 0},
+        {name: '￥9.9 以上', status: 0},
+        {name: '￥19.9 以上', status: 0},
+        {name: '￥29.9 以上', status: 0},
+      ]
     }
   },
   computed: {
@@ -80,13 +93,13 @@ export default {
     roomsRecently() {
       if (!this.selectName)
         if (this.subroom) return this.rooms
-        else return this.rooms.filter(room =>  this.timestamp - room.st <= 604800)
+        else return this.rooms.filter(room => this.timestamp - room.st <= 604800)
       else {
         this.subroom = false;
         return this.allRooms.filter(room => room.username.includes(this.selectName)
-            || room.room.toString().includes(this.selectName)
-            || room.uid.toString().includes(this.selectName)
-            || room.title.includes(this.selectName)
+          || room.room.toString().includes(this.selectName)
+          || room.uid.toString().includes(this.selectName)
+          || room.title.includes(this.selectName)
         )
       }
     },
@@ -113,7 +126,7 @@ export default {
     }
   },
   methods: {
-    updateRooms(newRooms=null, beforeFn=null, immediatelyFn=null, afterFn=null) {
+    updateRooms(newRooms = null, beforeFn = null, immediatelyFn = null, afterFn = null) {
       var rooms = document.getElementsByClassName("live")
       Array.from(rooms).forEach(
         (pp) => {
@@ -132,7 +145,8 @@ export default {
       if (this.subroom && !force) {
         if (this.rooms.length == 1 && this.rooms[0] == roomid) return;
         this.updateRooms([roomid],
-          () => document.getElementById('top').scrollIntoView({ behavior: 'smooth' }),
+          null,
+          // () => document.getElementById('top').scrollIntoView({ behavior: 'smooth' }),
           () => {
             axios
               .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
@@ -141,7 +155,19 @@ export default {
       } else {
         if (!parseInt(roomid))
           if (parseInt(roomid.room)) roomid = roomid.room
-          else return
+          else {
+            console.log(this.navStatus);
+            switch (roomid) {
+              case "esu":
+                this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
+                break;
+              default:
+                return;
+            }
+            clearInterval(this.innerPlan);
+            this.navStatus = 1;
+            this.innerPlan = setTimeout(() => this.navStatus = 0, 3000);
+          }
         axios
           .get('https://api.nana7mi.link/live/' + roomid)
           .then(response => response.data.lives)
@@ -157,7 +183,8 @@ export default {
                 lives,
                 null,
                 () => { this.selectName = null; this.subroom = true; },
-                () => document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' })
+                null
+                // () => document.getElementById('roomid').scrollIntoView({ behavior: 'smooth' })
               )
             }
           })
@@ -195,7 +222,7 @@ export default {
   font-size: 1em;
   font-weight: 540;
   padding: 1px 0 0 0.5em;
-  margin: 0 auto 1.34em;
+  margin: 0 auto;
   border: 1px solid #ced4da;
   border-radius: 0.5em;
   transition: all 0.2s;
@@ -207,6 +234,31 @@ export default {
   box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
 
+#controler {
+    position: relative;
+    margin-top: 1em;
+    display: flex;
+    justify-content: space-between;
+    transition: all 0.5s;
+}
+
+.selector {
+    padding: 0.3em 0 0.3em 1em;
+    /* margin-bottom: 1em; */
+    /* margin-right: 1em; */
+    width: 18%;
+    background-color: #FFF;
+}
+
+.up {
+    background-color: #FFF;
+}
+
+.down {
+    background-color: hsl(196, 100%, 97%);
+    box-shadow: 0 1.5px 4px skyblue;
+}
+
 #main {
   width: 75%;
   margin: 0px auto;
@@ -216,12 +268,6 @@ export default {
 .roundShadow {
   border-radius: 10px;
   box-shadow: 0 7px 10px rgb(100, 100, 100);
-}
-
-.gallery {
-  display: flex;
-  justify-content: space-between;
-  margin: 20px auto;
 }
 
 @media screen and (max-width: 900px) {
@@ -240,7 +286,7 @@ export default {
     padding-left: 0;
   }
 
-  .gallery {
+  #gallery {
     display: none;
   }
 }

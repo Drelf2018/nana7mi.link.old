@@ -4,24 +4,24 @@
             <div class="content">
                 <h2 style="margin-top: 0.7em; margin-bottom: 0.3em">本页面</h2>
                 <div style="display: flex;justify-content: space-between; margin-bottom: 1.75em;">
+                    <a href="https://github.com/Drelf2018/nana7mi.link" style="width: 48%">
                     <div class="link">
-                        <ion-icon name="logo-github" id="github"></ion-icon>
+                        <ion-icon name="logo-github" class="github"></ion-icon>
                         <div style="display: inline;">
-                            <a href="https://github.com/Drelf2018/nana7mi.link">
+                            
                                 <strong>前端</strong><br />
                                 <span style="color: grey;">VUE 3</span>
-                            </a>
                         </div>
-                    </div>
+                    </div></a>
+                    <a href="https://github.com/Drelf2018/api.nana7mi.link" style="width: 48%">
                     <div class="link">
-                        <ion-icon name="logo-github" id="github"></ion-icon>
+                        <ion-icon name="logo-github" class="github"></ion-icon>
                         <div style="display: inline;">
-                            <a href="https://github.com/Drelf2018/api.nana7mi.link">
+                            
                                 <strong>后端</strong><br />
                                 <span style="color: grey;">PY 3.10</span>
-                            </a>
                         </div>
-                    </div>
+                    </div></a>
                 </div>
             </div>
 
@@ -90,7 +90,6 @@ export default {
 
 .link {
     display: flex;
-    width: 48%;
     transition: all 0.1s;
     border-radius: 0.5em;
     box-shadow: 0 2px 5px grey;
@@ -101,7 +100,7 @@ export default {
     box-shadow: 0 1px 3px grey;
 }
 
-#github {
+.github {
     margin: auto 0;
     padding: 0 0.2em;
     font-size: 1.8em;
