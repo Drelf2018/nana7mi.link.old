@@ -22,12 +22,20 @@ var app = createApp(App)
 
 app.config.globalProperties.throttle = function(fn, delay=500) {
     var flag = new Date().getTime();
-    return function(...arg) {
+    return function(...args) {
         var tt = new Date().getTime();
         if (tt - flag >= delay) {
-            fn.call(this, ...arg);
+            fn.call(this, ...args);
             flag = tt;
         }
+    }
+}
+
+app.config.globalProperties.debounce = function(fn, delay=1000) {
+    var timer = null;
+    return function(...args) {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(()=>fn.call(this, ...args), delay);
     }
 }
 

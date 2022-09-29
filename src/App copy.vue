@@ -11,7 +11,13 @@
           </h1>
           <p id="subtitle"><strong><em>{{ this.quotations[this.qid] }}</em></strong></p>
           <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
-            @input="queryLiver" @keyup.enter.native="event => roomClick(event.target.value)">
+            @input="event => {
+              this.selectName = event.target.value;
+              this.danmaku = null;
+              this.button[3].maxPrice = '';
+              this.button[4].content = '';
+            }"
+            @keyup.enter.native="event => roomClick(event.target.value, true)">
           <!-- 目前可用指令：/esu /user -->
           
           <div class="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
@@ -24,7 +30,7 @@
           </div>
           <div class="controler" :style="'align-items: center;' + (danmaku ? 'opacity: 1;' : 'opacity: 0;')">
             <input v-if="danmaku" v-model="button[3].maxPrice" type="number" style="width: 48%;margin: 0px;" placeholder="大于等于指定金额，不填默认为零。">
-            <input v-if="danmaku" @input="queryHelp" @keyup.enter.native="queryHelp" type="text" style="width: 48%;margin: 0px;" placeholder="内容筛选，高阶用法输入 /help 查看。">
+            <input v-if="danmaku" @input="queryLive" type="text" style="width: 48%;margin: 0px;" placeholder="内容筛选，高阶用法输入 /help 查看。">
           </div>
         </div>
         <div class="show-block" id="gallery" style="margin-left: 1em;">
@@ -58,18 +64,14 @@ export default {
     Danmaku
   },
   mounted() {
-    this.queryUser = null;
-    this.get("rooms", data => {
-      this.allRooms = data.rooms;
-      this.allRooms.forEach(room => room.status = 1);
-      this.rooms = this.allRooms;
-    });
+    axios
+      .get('https://api.nana7mi.link/rooms')
+      .then(response => { this.rooms = response.data.rooms; this.subroom = false; this.allRooms = this.rooms; })
+      .catch(error => console.log(error));
   },
   data() {
     return {
       rooms: [],
-      allRooms: [],
-      danmaku: [],
       quotations: [
         '你们会无缘无故的说好用，就代表哪天无缘无故的就要骂难用',
         '哈咯哈咯，听得到吗',
@@ -83,6 +85,8 @@ export default {
       innerPlan: null,
       navStatus: 0,
       move: this.throttle(() => this.siderStatus ^= 1, 500),
+      subroom: false,
+      timestamp: Date.parse(new Date()) / 1000,
       danmaku: null,
       button: [
         {name: '礼物', status: 0},
@@ -92,40 +96,24 @@ export default {
         {content: null},
         {mountedWait: 0}
       ],
-      queryLiver: this.debounce(event => {
-        if (!this.queryUser) {
-          this.selectName = event.target.value;
-          this.danmaku = null;
-          this.button[3].maxPrice = '';
-          this.button[4].content = '';
-        }
-      }, 300),
-      queryHelp: this.debounce(event => {
-        if (event.target.value != '/help')
-          this.button[4].content = event.target.value
-        else {
-          this.inner = '<span style="font-size: 25px;padding: 1em">用类似逻辑电路的格式约定搜索方式，例如：\
-            A B+C D 表示搜索同时包含 A 与 D 且包含 B 或 C 。\
-            即空格表示与、加号表示或。</span>';
-          this.navStatus = 1;
-          setTimeout(() => this.navStatus = 0, 10000);
-        }
-      }),
-      queryUser: null
+      queryLive: this.debounce(this.queryHelp)
     }
   },
   computed: {
     liveList() {
-      if (!this.queryUser) return [{rooms: this.roomsSelected, danmaku: this.danmaku}]
-      else {}
+      return [{rooms: this.roomsRecently, danmaku: this.danmaku}]
     },
-    roomsSelected() {
-      if (!this.selectName) return this.rooms
-      else return this.allRooms.filter(
-        room => room.title.includes(this.selectName)
-             || room.username.includes(this.selectName)
-             || room.uid.toString().includes(this.selectName)
-             || room.room.toString().includes(this.selectName))
+    roomsRecently() {
+      if (!this.selectName)
+        if (this.subroom) return this.rooms
+        else return this.rooms.filter(room => this.timestamp - room.st <= 604800)
+      else {
+        this.subroom = false;
+        return this.allRooms.filter(room => room.username.includes(this.selectName)
+            || room.room.toString().includes(this.selectName)
+            || room.uid.toString().includes(this.selectName)
+            || room.title.includes(this.selectName))
+      }
     },
     banner() {
       function Banner(link, url) {
@@ -150,14 +138,16 @@ export default {
     }
   },
   methods: {
-    get(url, fn=null) {
-      axios
-        .get('https://api.nana7mi.link/'+url)
-        .then(response => {
-          if(response.data) 
-            if (fn) fn.call(this, response.data)
-        })
-        .catch(error => console.log(error));
+    queryHelp(event) {
+      if (event.target.value != '/help')
+        this.button[4].content = event.target.value
+      else {
+        this.inner = '<span style="font-size: 25px;padding: 1em">用类似逻辑电路的格式约定搜索方式，例如：\
+          A B+C D 表示搜索同时包含 A 与 D 且包含 B 或 C 。\
+          即空格表示与、加号表示或。</span>';
+        this.navStatus = 1;
+        setTimeout(() => this.navStatus = 0, 10000);
+      }
     },
     updateRooms(newRooms = null, immediatelyFn = null) {
       var rooms = document.getElementsByClassName("live")
@@ -172,61 +162,57 @@ export default {
         if (immediatelyFn) immediatelyFn();
       }, 500);
     },
-    command(cmd) {
-      switch (cmd) {
-        case "/esu":
-          this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
-          break;
-        case "/user":
-          var inp = document.getElementById("roomid");
-          inp.placeholder = "输入被查询人 UID";
-          inp.value = '';
-          // this.queryUser = function(uid) {
-          //   if (!parseInt(uid)) return;
-          //   this.get("uid/"+uid, data=>{console.log(data);this.queryUser=null})
-          // }
-          this.queryUser = () => {this.command("/error")}
-        case "/error":
-          this.inner = '<span style="font-size: 50px">我不会<br />长大以后再学习</span>';
-          break
-        default:
-          return;
-      }
-      clearInterval(this.innerPlan);
-      this.navStatus = 1;
-      this.innerPlan = setTimeout(() => this.navStatus = 0, 3000);
-    },
-    getLives(roomid) {
-      // 选择具体主播或者返回时搜索
-      this.danmaku = null;
-      this.get("live/"+roomid, data => {
-        if (data.status) {
-          this.inner = '<span style="font-size: 50px">' + data.status + '</span>';
-          this.navStatus = 1;
-          setTimeout(() => this.navStatus = 0, 3000);
-        } else {
-          var lives = data.lives;
-          var total = lives.length;
-          lives.forEach((value, index, arr) => {value.index = total - index - 1; value.status = 2;});
-          this.updateRooms(lives, () => this.selectName = null)
+    roomClick(roomid, force = false) {
+      if (this.subroom && !force) {
+        if (this.rooms.length == 1 && this.rooms[0] == roomid) {
+          if (this.button[5].mountedWait) {roomid = roomid.room; this.button[5].mountedWait=0;}
+          else return
         }
-      })
-    },
-    roomClick(room) {
-      if (this.queryUser) this.queryUser(room)
-      else if (parseInt(room)) this.getLives(room)
-      else if (room.status == 2) { // 查看具体弹幕
-        room.status = 3;
-        this.updateRooms([room], () => {
-          this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
+        else {
+          this.updateRooms([roomid], () => {
+            axios
+              .get('https://api.nana7mi.link/live/' + roomid.room + "/" + roomid.index)
+              .then(response => this.danmaku = response.data.live.danmaku)
+          })
+          return;
+        }
+      }
+
+      this.danmaku = null;
+      if (!parseInt(roomid))
+        if (parseInt(roomid.room)) roomid = roomid.room
+        else {
+          switch (roomid) {
+            case "/esu":
+              this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
+              break;
+            case "/user":
+              var inp = document.getElementById("roomid");
+              inp.placeholder = "输入被查询人 UID";
+              inp.value = '';
+              return
+            default:
+              return;
+          }
+          clearInterval(this.innerPlan);
+          this.navStatus = 1;
+          this.innerPlan = setTimeout(() => this.navStatus = 0, 3000);
+        }
+      axios
+        .get('https://api.nana7mi.link/live/' + roomid)
+        .then(response => response.data.lives)
+        .then(lives => {
+          if (!lives) {
+            this.inner = '<span style="font-size: 50px">房间号不存在</span>';
+            this.navStatus = 1;
+            setTimeout(() => this.navStatus = 0, 3000);
+          } else {
+            var total = lives.length;
+            lives.forEach((value, index, arr) => value.index = total - index - 1);
+            this.updateRooms(lives, () => { this.selectName = null; this.subroom = true; })
+          }
         })
-      }
-      else if (room.status == 3 && this.button[5].mountedWait) { // 返回选择
-        this.button[5].mountedWait = 0;
-        this.getLives(room.room);
-      }
-      else if (room.status == 1) this.getLives(room.room)
-      else this.command(room)
+        .catch(error => console.log(error));
     }
   }
 }
