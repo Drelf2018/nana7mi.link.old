@@ -69,7 +69,6 @@ export default {
     return {
       rooms: [],
       allRooms: [],
-      danmaku: [],
       quotations: [
         '你们会无缘无故的说好用，就代表哪天无缘无故的就要骂难用',
         '哈咯哈咯，听得到吗',
