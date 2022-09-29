@@ -5,23 +5,25 @@
                 <h2 style="margin-top: 0.7em; margin-bottom: 0.3em">本页面</h2>
                 <div style="display: flex;justify-content: space-between; margin-bottom: 1.75em;">
                     <a href="https://github.com/Drelf2018/nana7mi.link" style="width: 48%">
-                    <div class="link">
-                        <ion-icon name="logo-github" class="github"></ion-icon>
-                        <div style="display: inline;">
-                            
+                        <div class="link">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/9/95/Vue.js_Logo_2.svg" class="github">
+                            <!-- <ion-icon name="logo-vue" class="github"></ion-icon> -->
+                            <div style="display: inline;">
                                 <strong>前端</strong><br />
                                 <span style="color: grey;">VUE 3</span>
+                            </div>
                         </div>
-                    </div></a>
+                    </a>
                     <a href="https://github.com/Drelf2018/api.nana7mi.link" style="width: 48%">
-                    <div class="link">
-                        <ion-icon name="logo-github" class="github"></ion-icon>
-                        <div style="display: inline;">
-                            
+                        <div class="link">
+                            <img src="https://s3.dualstack.us-east-2.amazonaws.com/pythondotorg-assets/media/files/python-logo-only.svg" class="github">
+                            <!-- <ion-icon name="logo-python" class="github"></ion-icon> -->
+                            <div style="display: inline;">
                                 <strong>后端</strong><br />
                                 <span style="color: grey;">PY 3.10</span>
+                            </div>
                         </div>
-                    </div></a>
+                    </a>
                 </div>
             </div>
 
@@ -42,11 +44,11 @@
 
             <div class="content">
                 <h2 style="margin-top: 0.7em; margin-bottom: 0.3em">关于</h2>
-                一时兴起写的弹幕站，起因是原来用 
+                一时兴起写的弹幕站，起因是原来用
                 <a class="username" href="https://github.com/Drelf2018/api.nana7mi.link">Python</a>
-                 写的太卡了。<br />
+                写的太卡了。<br />
                 一口气把 Html、CSS、JS、Vue 都看完了，然后尝试着自己写了这个，最后只能说勉勉强强吧。<br />
-                关于收录的主播，如果你有想添加的主播，可以在 Github 上本仓库提交 
+                关于收录的主播，如果你有想添加的主播，可以在 Github 上本仓库提交
                 <a class="username" href="https://github.com/Drelf2018/nana7mi.link/issues">Issues</a> 。<br />
                 如果我看到了会去判断是否要添加，谢谢理解。<br /><br />
                 <span style="color: #F5F5F7"><em>鼠标放在最上面的眼睛试试？</em></span>
@@ -101,6 +103,7 @@ export default {
 }
 
 .github {
+    width: 1em;
     margin: auto 0;
     padding: 0 0.2em;
     font-size: 1.8em;
