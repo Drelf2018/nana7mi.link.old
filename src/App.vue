@@ -23,8 +23,8 @@
             </div>
           </div>
           <div class="controler" :style="'align-items: center;' + (danmaku ? 'opacity: 1;' : 'opacity: 0;')">
-            <input v-if="danmaku" v-model="button[3].maxPrice" type="number" style="width: 48%;margin: 0px;" placeholder="大于等于指定金额，不填默认为零。">
-            <input v-if="danmaku" @input="queryHelp" @keyup.enter.native="queryHelp" type="text" style="width: 48%;margin: 0px;" placeholder="内容筛选，高阶用法输入 /help 查看。">
+            <input v-if="danmaku" v-model="button[3].maxPrice" type="number" style="width: 49%;margin: 0px;" placeholder="金额筛选，默认不小于零。">
+            <input v-if="danmaku" @input="queryHelp" @keyup.enter.native="queryHelp" type="text" style="width: 49%;margin: 0px;" placeholder="内容筛选，输入 /help 查看更多。">
           </div>
         </div>
         <div class="show-block" id="gallery" style="margin-left: 1em;">
@@ -89,7 +89,8 @@ export default {
         {name: '醒目留言', status: 0},
         {maxPrice: null, status: 0},
         {content: null},
-        {mountedWait: 0}
+        {mountedWait: 0},
+        {timeStr: null, dateStr: null, baseStr: null}
       ],
       queryLiver: this.debounce(event => {
         if (!this.queryUser) {
@@ -216,11 +217,17 @@ export default {
       else if (parseInt(room)) this.getLives(room)
       else if (room.status == 2) { // 查看具体弹幕
         room.status = 3;
+        this.button[6].dateStr = new Date(room.st * 1000).Format('yyyy-MM-dd')
+        this.button[6].baseStr = new Date(room.st * 1000).Format('hh:mm:ss')
+        if (!room.sp) room.plan = setInterval(() => {
+          this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
+        }, 11000)
         this.updateRooms([room], () => {
           this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
         })
       }
       else if (room.status == 3 && this.button[5].mountedWait) { // 返回选择
+        if (!room.sp) clearInterval(room.plan)
         this.button[5].mountedWait = 0;
         this.getLives(room.room);
       }
@@ -280,7 +287,7 @@ input:focus {
 
 .selector {
     padding: 0.3em 0 0.3em 1em;
-    width: 25%;
+    width: 30%;
     background-color: #FFF;
 }
 

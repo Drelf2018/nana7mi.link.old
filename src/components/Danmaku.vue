@@ -1,5 +1,6 @@
 <template>
     <div class="show-block" id="danmaku" style="opacity: 0;left: 100%;">
+        <input v-if="danmaku" v-model="button[6].timeStr" type="text" style="width: 22%;margin: 1em 0;float: right;" :placeholder="'时间筛选，默认不小于 ' + this.button[6].baseStr">
         <p v-for="dm in splitDanmaku">
             {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
             <a class="username" :href="'https://space.bilibili.com/' + dm.uid">{{ dm.username }}</a>
@@ -29,13 +30,18 @@ export default {
     computed: {
         splitDanmaku() {
             if (this.danmaku)
-                if (this.button[0].status || this.button[1].status || this.button[2].status || this.button[3].maxPrice || this.button[4].content) {
+                if (this.button[0].status || this.button[1].status || this.button[2].status 
+                 || this.button[3].maxPrice || this.button[4].content || this.button[6].timeStr) {
                     var all = !this.button[0].status && !this.button[1].status && !this.button[2].status
                     var maxPrice = this.button[3].maxPrice ? this.button[3].maxPrice : 0
                     var check = this.analyse(this.button[4].content)
+                    if (this.button[6].timeStr)
+                        var tt = new Date(this.button[6].dateStr + ' ' + this.button[6].timeStr).getTime() / 1000
+                    else var tt = 0
                     return this.danmaku.filter(
                         dm => {
-                            return (dm.price >= maxPrice)
+                            return dm.price >= maxPrice
+                                && dm.time >= tt
                                 && (all || this.button[this.Type[dm.type]].status)
                                 && check(dm.username + dm.msg)
                         }
