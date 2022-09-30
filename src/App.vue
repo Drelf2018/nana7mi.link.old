@@ -1,4 +1,5 @@
 <template>
+  <a id="top"></a>
   <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :inner="inner" :status="navStatus"></Nav>
   <div class="view">
     <Sider id="sider" :status="siderStatus"></Sider>
@@ -15,9 +16,14 @@
           <!-- 目前可用指令：/esu /user -->
           
           <div class="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
-            <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="btn in (danmaku ? button.slice(0, 3) : [])" @click="btn.status ^= 1">
+            <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="(btn, index) in (danmaku ? button.slice(0, 3) : [])" @click="btn.status ^= 1">
               <div style="display: inline;">
-                <strong>{{ btn.name }}</strong><br />
+                <strong>{{ btn.name }}</strong>
+                <span style="color: red;">￥{{ 
+                  index == 0 ? this.rooms[0].send_gift.toFixed(2) :
+                  index == 1 ? this.rooms[0].guard_buy.toFixed(2) :
+                  index == 2 ? this.rooms[0].super_chat_message.toFixed(2) : "0.00"
+                }}</span><br />
                 <span style="color: grey;">{{ btn.status ? '是' : '否'}}</span>
               </div>
             </div>
@@ -208,7 +214,10 @@ export default {
           var lives = data.lives;
           var total = lives.length;
           lives.forEach((value, index, arr) => {value.index = total - index - 1; value.status = 2;});
-          this.updateRooms(lives, () => this.selectName = null)
+          this.updateRooms(lives, () => {
+            this.selectName = null;
+            setTimeout(()=>document.getElementById('top').scrollIntoView({ behavior: 'smooth' }), 500);
+          })
         }
       })
     },
@@ -223,7 +232,13 @@ export default {
           this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
         }, 11000)
         this.updateRooms([room], () => {
-          this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
+          this.get("live/" + room.room + "/" + room.index, data => {
+            var new_room = data.live;
+            new_room.status = 3;
+            new_room.sp = room.sp;
+            this.rooms = [new_room]
+            this.danmaku = new_room.danmaku
+          })
         })
       }
       else if (room.status == 3 && this.button[5].mountedWait) { // 返回选择

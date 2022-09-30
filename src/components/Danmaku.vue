@@ -1,6 +1,7 @@
 <template>
     <div class="show-block" id="danmaku" style="opacity: 0;left: 100%;">
         <input v-if="danmaku" v-model="button[6].timeStr" type="text" style="width: 22%;margin: 1em 0;float: right;" :placeholder="'时间筛选，默认不小于 ' + this.button[6].baseStr">
+        <span v-if="danmaku" style="margin: 1.5em 0.5em;float: right;"> 目前弹幕量：{{ this.splitDanmaku.length }} </span>
         <p v-for="dm in splitDanmaku">
             {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
             <a class="username" :href="'https://space.bilibili.com/' + dm.uid">{{ dm.username }}</a>
