@@ -29,8 +29,8 @@
             </div>
           </div>
           <div class="controler" :style="'align-items: center;' + (danmaku ? 'opacity: 1;' : 'opacity: 0;')">
-            <input v-if="danmaku" v-model="button[3].maxPrice" type="number" style="width: 49%;margin: 0px;" placeholder="金额筛选，默认不小于零。">
-            <input v-if="danmaku" @input="queryHelp" @keyup.enter.native="queryHelp" type="text" style="width: 49%;margin: 0px;" placeholder="内容筛选，输入 /help 查看更多。">
+            <input class="inp" v-if="danmaku" v-model="button[3].maxPrice" type="number" placeholder="金额筛选，默认不小于零。">
+            <input class="inp" v-if="danmaku" @input="queryHelp" @keyup.enter.native="queryHelp" type="text" placeholder="内容筛选，输入 /help 查看更多。">
           </div>
         </div>
         <div class="show-block" id="gallery" style="margin-left: 1em;">
@@ -145,7 +145,7 @@ export default {
         ),
         new Banner(
           "https://www.bilibili.com/video/BV1T24y1R7wd",
-          "http://i1.hdslb.com/bfs/archive/ab9738d7aee96044183b61c7dd9c95eb1ec17ed1.jpg"
+          "https://i1.hdslb.com/bfs/archive/ab9738d7aee96044183b61c7dd9c95eb1ec17ed1.jpg"
         ),
         new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
         new Banner("", "esu2.png"),
@@ -321,6 +321,11 @@ input:focus {
   transition: all 0.5s;
 }
 
+.inp {
+  width: 49%;
+  margin: 0px;
+}
+
 .roundShadow {
   border-radius: 10px;
   box-shadow: 0 7px 10px rgb(100, 100, 100);
@@ -344,6 +349,21 @@ input:focus {
 
   #gallery {
     display: none;
+  }
+
+  .controler{
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .selector {
+    width: 95%;
+    margin-bottom: 0.5em;
+  }
+
+  .inp {
+    width: 100%;
+    margin-bottom: 0.5em;
   }
 }
 </style>
