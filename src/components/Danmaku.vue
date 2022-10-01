@@ -1,11 +1,16 @@
 <template>
-    <div class="show-block" id="danmaku" style="opacity: 0;left: 100%;">
-        <input v-if="danmaku" v-model="button[6].timeStr" type="text" style="width: 22%;margin: 1em 0;float: right;" :placeholder="'时间筛选，默认不小于 ' + this.button[6].baseStr">
-        <span v-if="danmaku" style="margin: 1.5em 0.5em;float: right;"> 目前弹幕量：{{ this.splitDanmaku.length }} </span>
+    <div class="show-block danmaku" style="opacity: 0;left: 100%;">
+        <div v-if="!index" style="float: right;width: 30%;display: flex;flex-direction: column;align-items: flex-end;">
+            <input v-if="danmaku" v-model="button[6].timeStr" type="text" style="margin: 1em 0;" :placeholder="'时间筛选，默认不小于 ' + this.button[6].baseStr">
+            <span v-if="danmaku"> 目前弹幕量：{{ this.splitDanmaku.length }} </span>
+        </div>
         <p v-for="dm in splitDanmaku">
-            {{ new Date(dm.time * 1000).Format("hh:mm:ss") }}&nbsp;&nbsp;
-            <a class="username" :href="'https://space.bilibili.com/' + dm.uid">{{ dm.username }}</a>
-            &nbsp;&nbsp;<span v-html="dm.msg"></span>
+            {{ new Date(dm.time * 1000).Format(dm.room ? "yyyy-MM-dd hh:mm:ss" : "hh:mm:ss") }}
+            <a class="username" :href="'https://space.bilibili.com/' + dm.uid" style="margin-left: 0.5em;">{{ dm.username }}</a>
+            <span style="margin-left: 1em;" v-html="dm.msg"></span>
+            <a style="margin-left: 1em;" :href="'https://live.bilibili.com/' + dm.room">
+                <span style="color: grey"><em>{{ dm.room }}</em></span>
+            </a>
         </p>
     </div>
 </template>
@@ -16,6 +21,7 @@ export default {
     props: {
         danmaku: Object,
         button: [Object],
+        index: 0
     },
     data() {
         return {
@@ -32,7 +38,8 @@ export default {
         splitDanmaku() {
             if (this.danmaku)
                 if (this.button[0].status || this.button[1].status || this.button[2].status 
-                 || this.button[3].maxPrice || this.button[4].content || this.button[6].timeStr) {
+                 || this.button[3].maxPrice || this.button[4].content || this.button[6].timeStr
+                 || this.index) {
                     var all = !this.button[0].status && !this.button[1].status && !this.button[2].status
                     var maxPrice = this.button[3].maxPrice ? this.button[3].maxPrice : 0
                     var check = this.analyse(this.button[4].content)
@@ -41,6 +48,7 @@ export default {
                     else var tt = 0
                     return this.danmaku.filter(
                         dm => {
+                            if (this.index) return true
                             return dm.price >= maxPrice
                                 && dm.time >= tt
                                 && (all || this.button[this.Type[dm.type]].status)
@@ -53,7 +61,7 @@ export default {
         }
     },
     updated() {
-        var self = document.getElementById("danmaku");
+        var self = document.getElementById("danmaku" + (this.index ? this.index : ''));
         if (this.danmaku) {
             self.style.opacity = 1;       
             self.style.left = "0%";
@@ -66,7 +74,14 @@ export default {
         }
     },
     mounted() {
-        window.addEventListener('scroll', this.lazyLoading); // 滚动到底部，再加载的处理事件
+        if (!this.index) window.addEventListener('scroll', this.lazyLoading); // 滚动到底部，再加载的处理事件
+        else {
+            var self = document.getElementById("danmaku" + (this.index ? this.index : ''));
+            setTimeout(() => {
+                self.style.opacity = 1;
+                self.style.left = "0%";
+            }, 1)
+        }
     },
     methods: {
         lazyLoading() { // 滚动到底部，再加载的处理事件
@@ -102,7 +117,7 @@ export default {
     text-decoration: underline;
 }
 
-#danmaku {
+.danmaku {
     padding: 0 1em;
     transition: all 0.5s;
     overflow: hidden;

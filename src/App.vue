@@ -13,7 +13,7 @@
           <p id="subtitle"><strong><em>{{ this.quotations[this.qid] }}</em></strong></p>
           <input id="roomid" type="text" placeholder="支持模糊搜索及直播间号精确定位"
             @input="queryLiver" @keyup.enter.native="event => roomClick(event.target.value)">
-          <!-- 目前可用指令：/esu /user -->
+          <!-- 目前可用指令：esu user -->
           
           <div class="controler" :style="danmaku ? 'opacity: 1;' : 'opacity: 0;'">
             <div :class="[btn.status ? 'down' : 'up', 'link', 'selector']" v-for="(btn, index) in (danmaku ? button.slice(0, 3) : [])" @click="btn.status ^= 1">
@@ -40,7 +40,7 @@
       <div v-for="live in liveList">
         <Room v-for="room in live.rooms" style="opacity: 0;left: 100%;" :id="room.room + '_' + room.st" :room="room"
           @click="roomClick(room)"></Room>
-        <Danmaku :danmaku="live.danmaku" :button="button"></Danmaku>
+        <Danmaku :danmaku="live.danmaku" :button="button" :index="live.index" :id="'danmaku' + (live.index ? live.index : '')"></Danmaku>
       </div>
     </div>
   </div>
@@ -117,13 +117,15 @@ export default {
           setTimeout(() => this.navStatus = 0, 10000);
         }
       }),
-      queryUser: null
+      queryUser: null,
+      queryRunning: false,
+      userDanmaku: []
     }
   },
   computed: {
     liveList() {
       if (!this.queryUser) return [{rooms: this.roomsSelected, danmaku: this.danmaku}]
-      else {}
+      else return this.userDanmaku
     },
     roomsSelected() {
       if (!this.selectName) return this.rooms
@@ -140,6 +142,14 @@ export default {
       };
       var res = [
         new Banner(
+          "https://www.bilibili.com/video/BV1vJ411B7ng",
+          "https://i2.hdslb.com/bfs/archive/7fe8272ef4c90d07ba2dba968638392f8d5bf490.jpg"
+        ),    
+        new Banner(
+          "https://www.bilibili.com/video/BV1he4y1r79x",
+          "https://i1.hdslb.com/bfs/archive/ca796b3fe2a213c652ebb32469d81511036c7117.jpg"
+        ),
+        new Banner(
           "https://www.bilibili.com/video/BV1tG411g7Fo",
           "https://i0.hdslb.com/bfs/archive/b7868c38077aaa66e233499723a4d7490804f861.png"
         ),
@@ -148,8 +158,7 @@ export default {
           "https://i1.hdslb.com/bfs/archive/ab9738d7aee96044183b61c7dd9c95eb1ec17ed1.jpg"
         ),
         new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
-        new Banner("", "esu2.png"),
-        new Banner("", "esu3.png")
+        new Banner("", "esu2.png")
       ];
       res.push(res[0]);
       return res;
@@ -180,18 +189,43 @@ export default {
     },
     command(cmd) {
       switch (cmd) {
-        case "/esu":
+        case "esu":
           this.inner = '<iframe class="roundShadow" width=95% height=90% src="//player.bilibili.com/player.html?aid=78090377&bvid=BV1pR4y1W7M7&cid=133606284&page=1" scrolling="no" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>';
           break;
-        case "/user":
+        case "user":
           var inp = document.getElementById("roomid");
           inp.placeholder = "输入被查询人 UID";
           inp.value = '';
-          // this.queryUser = function(uid) {
-          //   if (!parseInt(uid)) return;
-          //   this.get("uid/"+uid, data=>{console.log(data);this.queryUser=null})
-          // }
-          this.queryUser = () => {this.command("/error")}
+          if (!this.rooms[0].sp) clearInterval(this.rooms[0].plan)
+          this.queryUser = function(uid) {
+            if (!parseInt(uid)) return;
+            if (this.queryRunning) return;
+            this.queryRunning = true
+            this.get("uid/"+uid, data=>{
+              this.danmaku = null
+              this.userDanmaku = []
+              var tempDanmaku = []
+              var index = 1
+              data.danmaku.forEach(dm => {
+                if (!dm.room_info){
+                  if (String(dm.time).length > 10) dm.time /= 1000
+                  tempDanmaku.push(dm)
+                }
+                else {
+                  if (tempDanmaku.length) {
+                    this.userDanmaku.push({rooms: [], danmaku: tempDanmaku, index: index})
+                    tempDanmaku = []
+                    index += 1
+                  }
+                  this.userDanmaku.push({rooms: [dm.room_info], danmaku: dm.danmaku, index: index})
+                  index += 1
+                }
+              })
+              if (tempDanmaku.length) this.userDanmaku.push({rooms: [], danmaku: tempDanmaku, index: index})
+              this.queryRunning = false
+            })
+          }
+          return
         case "/error":
           this.inner = '<span style="font-size: 50px">我不会<br />长大以后再学习</span>';
           break
@@ -228,14 +262,14 @@ export default {
         room.status = 3;
         this.button[6].dateStr = new Date(room.st * 1000).Format('yyyy-MM-dd')
         this.button[6].baseStr = new Date(room.st * 1000).Format('hh:mm:ss')
-        if (!room.sp) room.plan = setInterval(() => {
-          this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
-        }, 11000)
         this.updateRooms([room], () => {
           this.get("live/" + room.room + "/" + room.index, data => {
             var new_room = data.live;
             new_room.status = 3;
             new_room.sp = room.sp;
+            if (!room.sp) new_room.plan = setInterval(() => {
+              this.get("live/" + room.room + "/" + room.index, data => this.danmaku = data.live.danmaku)
+            }, 11000)
             this.rooms = [new_room]
             this.danmaku = new_room.danmaku
           })

@@ -53,7 +53,7 @@ export default {
                 if (maxAlpha)
                     document.getElementById('swiperBox').style.width = maxAlpha * parseInt(this.height) + 'px';
                 else
-                    document.getElementById('swiperBox').style.width = '300px';
+                    document.getElementById('swiperBox').style.width = '366px';
             }, 300);
         },
         stop() {
