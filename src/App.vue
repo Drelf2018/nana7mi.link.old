@@ -1,6 +1,9 @@
 <template>
   <a id="top"></a>
-  <Nav href='https://t.bilibili.com/682043379459031137' src="eyes.png" :move="move" :inner="inner" :status="navStatus"></Nav>
+  <Nav href='https://t.bilibili.com/682043379459031137' 
+    src="https://i0.hdslb.com/bfs/new_dyn/0de10012b4a96d7d4bcd82728f77b2051464240042.png" 
+    :move="move" :inner="inner" :status="navStatus">
+  </Nav>
   <div class="view">
     <Sider id="sider" :status="siderStatus"></Sider>
     <div id="main" :style="'padding-left: ' + siderStatus * 20 + '%;'">
@@ -34,7 +37,7 @@
           </div>
         </div>
         <div class="show-block" id="gallery" style="margin-left: 1em;">
-          <Swiper speed=7000 height="229px" :banner="banner"></Swiper>
+          <Swiper speed=5000 height="229px" :banner="banner"></Swiper>
         </div>
       </div>
       <div v-for="live in liveList">
@@ -157,8 +160,11 @@ export default {
           "https://www.bilibili.com/video/BV1T24y1R7wd",
           "https://i1.hdslb.com/bfs/archive/ab9738d7aee96044183b61c7dd9c95eb1ec17ed1.jpg"
         ),
-        new Banner("https://www.bilibili.com/video/BV1pR4y1W7M7", "esu1.png"),
-        new Banner("", "esu2.png")
+        new Banner(
+          "https://www.bilibili.com/video/BV1pR4y1W7M7",
+          "https://i0.hdslb.com/bfs/new_dyn/8b90b7582c6fa3023eda3ffb58bf8eeb1464240042.png"
+        ),
+        new Banner("", "https://i0.hdslb.com/bfs/new_dyn/3c611630235bca6cc7eadca431573c1f1464240042.png")
       ];
       res.push(res[0]);
       return res;

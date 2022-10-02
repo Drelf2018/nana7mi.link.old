@@ -10,6 +10,9 @@
                 </div>
             </div>
         </div>
+        <div class="dotList">
+            <div class="dot" v-for="i in banner.length - 1" :style="count == i-1 ? 'opacity: 1;' : 'opacity: 0.5;'"></div>
+        </div>
         <ion-icon name="chevron-back-circle" class="btn" style="left: 10px" @click="move(-1)"></ion-icon>
         <ion-icon name="chevron-forward-circle" class="btn" style="right: 10px" @click="move(1)"></ion-icon>
     </div>
@@ -61,7 +64,6 @@ export default {
                 clearInterval(this.timer);
                 this.timer = null;
             }
-
         },
         start() {
             var that = this;
@@ -121,7 +123,7 @@ export default {
 
 <style>
 #swiperBox {
-    width: 0px;
+    width: 366px;
     height: 250px;
     position: relative;
     border-radius: 10px;
@@ -180,5 +182,28 @@ img.swiper-height {
     right: 0;
     position: absolute;
     margin: auto;
+}
+
+.dotList {
+    position: absolute;
+    display:flex;
+    bottom: 0.5em;
+    right: 0.6em;
+    opacity: 0.75;
+    transition: all 0.3s;
+}
+
+#swiperBox:hover .dotList {
+    opacity: 1;
+}
+
+.dot {
+    background-color: white;
+    width:1em;
+    height:1em;
+    border-radius: 0.5em;
+    margin-left: 0.5em;
+    transition: all 0.3s;
+    box-shadow: 0 2px 3px grey;
 }
 </style>

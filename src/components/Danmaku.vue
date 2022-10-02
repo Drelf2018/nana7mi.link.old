@@ -1,6 +1,6 @@
 <template>
     <div class="show-block danmaku" style="opacity: 0;left: 100%;">
-        <div v-if="!index" style="float: right;width: 30%;display: flex;flex-direction: column;align-items: flex-end;">
+        <div v-if="!index" style="float: right;width: 22%;display: flex;flex-direction: column;align-items: flex-end;">
             <input v-if="danmaku" v-model="button[6].timeStr" type="text" style="margin: 1em 0;" :placeholder="'时间筛选，默认不小于 ' + this.button[6].baseStr">
             <span v-if="danmaku"> 目前弹幕量：{{ this.splitDanmaku.length }} </span>
         </div>
